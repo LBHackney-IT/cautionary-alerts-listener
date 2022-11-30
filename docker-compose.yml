@@ -1,11 +1,11 @@
 version: "3.2"
 
 services:
-  base-listener:
-    image: base-listener
+  cautionary-alerts-listener:
+    image: cautionary-alerts-listener
     build:
       context: .
-      dockerfile: BaseListener/Dockerfile
+      dockerfile: CautionaryAlertsListener/Dockerfile
       args:
         - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
     ports:
@@ -21,11 +21,11 @@ services:
     links:
       - dynamodb-database
 
-  base-listener-test:
-    image: base-listener-test
+  cautionary-alerts-listener-test:
+    image: cautionary-alerts-listener-test
     build:
       context: .
-      dockerfile: BaseListener.Tests/Dockerfile
+      dockerfile: CautionaryAlertsListener.Tests/Dockerfile
       args:
         - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
     environment:
