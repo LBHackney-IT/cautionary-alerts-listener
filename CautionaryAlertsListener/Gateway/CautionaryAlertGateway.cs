@@ -1,3 +1,5 @@
+using Amazon.DynamoDBv2.Model;
+using Amazon.XRay.Recorder.Core.Internal.Entities;
 using CautionaryAlertsListener.Domain;
 using CautionaryAlertsListener.Factories;
 using CautionaryAlertsListener.Gateway.Interfaces;
@@ -6,6 +8,7 @@ using Hackney.Core.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -23,11 +26,13 @@ namespace CautionaryAlertsListener.Gateway
         }
 
         [LogCall]
-        public async Task<PropertyAlert> GetEntityByMMHAsync(string mmhId)
+        public async Task<ICollection<PropertyAlert>> GetEntitiesByMMHAsync(string mmhId)
         {
             _logger.LogDebug($"Calling Postgres for mmhId {mmhId}");
             var dbEntity = await _cautionaryAlertDbContext.PropertyAlerts
-                .FirstOrDefaultAsync(x => x.MMHID == mmhId).ConfigureAwait(false);
+                .Where(x => x.MMHID == mmhId)
+                .ToListAsync()
+                .ConfigureAwait(false);
             return dbEntity;
         }
 
@@ -46,6 +51,17 @@ namespace CautionaryAlertsListener.Gateway
         {
             _logger.LogDebug($"Calling Postgres.SaveAsync for mmhId {entity.MMHID}");
             _cautionaryAlertDbContext.PropertyAlerts.Update(entity);
+            await _cautionaryAlertDbContext.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+        [LogCall]
+        public async Task UpdateEntitiesAsync(IEnumerable<PropertyAlert> propertyAlerts)
+        {
+            _logger.LogDebug($"Calling Postgres.SaveAsync for mmhId {string.Join(',', propertyAlerts.Select(x => x.MMHID))}");
+
+            foreach (var propertyAlert in propertyAlerts)
+                _cautionaryAlertDbContext.PropertyAlerts.Update(propertyAlert);
+
             await _cautionaryAlertDbContext.SaveChangesAsync().ConfigureAwait(false);
         }
     }

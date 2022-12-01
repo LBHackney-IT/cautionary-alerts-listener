@@ -7,6 +7,8 @@ using Hackney.Core.Logging;
 using System.Threading.Tasks;
 using System;
 using CautionaryAlertsListener.Infrastructure;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace CautionaryAlertsListener.UseCase
 {
@@ -24,19 +26,24 @@ namespace CautionaryAlertsListener.UseCase
         {
             if (message is null) throw new ArgumentNullException(nameof(message));
 
-            var entity = await _gateway.GetEntityByMMHAsync(message.EntityId.ToString()).ConfigureAwait(false);
-            if (entity is null) throw new EntityNotFoundException<PropertyAlert>(message.EntityId);
+            var entityCollection = await _gateway.GetEntitiesByMMHAsync(message.EntityId.ToString()).ConfigureAwait(false);
+            if (entityCollection is null) throw new EntityNotFoundException<PropertyAlert>(message.EntityId);
 
             var objectProps = message.EventData.NewData.GetType().GetProperties();
-
-            foreach (var property in objectProps)
+            var collectionToUpdate = new List<PropertyAlert>();
+            foreach (var entity in entityCollection)
             {
-                var newValue = property.GetValue(message.EventData.NewData).ToString();
-                var oldValue = property.GetValue(message.EventData.OldData).ToString();
-                entity.PersonName = entity.PersonName.Replace(oldValue, newValue);
+                foreach (var property in objectProps)
+                {
+                    var newValue = property.GetValue(message.EventData.NewData).ToString();
+                    var oldValue = property.GetValue(message.EventData.OldData).ToString();
+                    entity.PersonName = entity.PersonName.Replace(oldValue, newValue);
+                }
+
+                collectionToUpdate.Add(entity);
             }
 
-            await _gateway.UpdateEntityAsync(entity).ConfigureAwait(false);
+            await _gateway.UpdateEntitiesAsync(collectionToUpdate).ConfigureAwait(false);
         }
     }
 }
