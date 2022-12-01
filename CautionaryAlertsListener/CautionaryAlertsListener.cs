@@ -1,12 +1,15 @@
 using Amazon.Lambda.Core;
 using Amazon.Lambda.SQSEvents;
 using CautionaryAlertsListener.Boundary;
+using CautionaryAlertsListener.Factories;
 using CautionaryAlertsListener.Gateway;
 using CautionaryAlertsListener.Gateway.Interfaces;
+using CautionaryAlertsListener.Infrastructure;
 using CautionaryAlertsListener.UseCase;
 using CautionaryAlertsListener.UseCase.Interfaces;
 using Hackney.Core.DynamoDb;
 using Hackney.Core.Logging;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -19,44 +22,30 @@ using System.Threading.Tasks;
 
 namespace CautionaryAlertsListener
 {
-    /// <summary>
-    /// Lambda function triggered by an SQS message
-    /// </summary>
     [ExcludeFromCodeCoverage]
-    public class SqsFunction : BaseFunction
+    public class CautionaryAlertsListener : BaseFunction
     {
         /// <summary>
         /// Default constructor. This constructor is used by Lambda to construct the instance. When invoked in a Lambda environment
         /// the AWS credentials will come from the IAM role associated with the function and the AWS region will be set to the
         /// region the Lambda function is executed in.
         /// </summary>
-        public SqsFunction()
+        public CautionaryAlertsListener()
         { }
 
-        /// <summary>
-        /// Use this method to perform any DI configuration required
-        /// </summary>
-        /// <param name="services"></param>
+
         protected override void ConfigureServices(IServiceCollection services)
         {
-            services.ConfigureDynamoDB();
-
             services.AddHttpClient();
-            services.AddScoped<IDoSomethingUseCase, DoSomethingUseCase>();
-
-            services.AddScoped<IDbEntityGateway, DynamoDbEntityGateway>();
+            services.AddScoped<IAddPersonToTenureUseCase, AddPersonToTenureUseCase>();
+            services.AddScoped<IRemovePersonFromTenureUseCase, RemovePersonFromTenureUseCase>();
+            services.AddScoped<IPersonUpdatedUseCase, PersonUpdatedUseCase>();
+            services.AddScoped<ICautionaryAlertGateway, CautionaryAlertGateway>();
+            ConfigureDbContext(services);
 
             base.ConfigureServices(services);
         }
 
-
-        /// <summary>
-        /// This method is called for every Lambda invocation. This method takes in an SQS event object and can be used 
-        /// to respond to SQS messages.
-        /// </summary>
-        /// <param name="evnt"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
         public async Task FunctionHandler(SQSEvent evnt, ILambdaContext context)
         {
             // Do this in parallel???
@@ -66,12 +55,6 @@ namespace CautionaryAlertsListener
             }
         }
 
-        /// <summary>
-        /// Method called to process every distinct message received.
-        /// </summary>
-        /// <param name="message"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
         [LogCall(LogLevel.Information)]
         private async Task ProcessMessageAsync(SQSEvent.SQSMessage message, ILambdaContext context)
         {
@@ -83,18 +66,12 @@ namespace CautionaryAlertsListener
             {
                 try
                 {
-                    IMessageProcessing processor = null;
-                    switch (entityEvent.EventType)
-                    {
-                        case EventTypes.DoSomethingEvent:
-                            {
-                                processor = ServiceProvider.GetService<IDoSomethingUseCase>();
-                                break;
-                            }
-                        // TODO - Implement other message types here...
-                        default:
-                            throw new ArgumentException($"Unknown event type: {entityEvent.EventType} on message id: {message.MessageId}");
-                    }
+                    IMessageProcessing processor = entityEvent.CreateUseCaseForMessage(ServiceProvider);
+                    if (processor != null)
+                        await processor.ProcessMessageAsync(entityEvent).ConfigureAwait(false);
+                    else
+                        Logger.LogInformation($"No processors available for message so it will be ignored. " +
+                            $"Message id: {message.MessageId}; type: {entityEvent.EventType}; version: {entityEvent.Version}; entity id: {entityEvent.EntityId}");
 
                     await processor.ProcessMessageAsync(entityEvent).ConfigureAwait(false);
                 }
@@ -104,6 +81,14 @@ namespace CautionaryAlertsListener
                     throw; // AWS will handle retry/moving to the dead letter queue
                 }
             }
+        }
+
+        private static void ConfigureDbContext(IServiceCollection services)
+        {
+            var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+
+            services.AddDbContext<CautionaryAlertContext>(
+                opt => opt.UseNpgsql(connectionString));
         }
     }
 }

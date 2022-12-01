@@ -14,11 +14,6 @@ using System.Text.Json;
 
 namespace CautionaryAlertsListener
 {
-    /// <summary>
-    /// Base class used for all functions
-    /// Sets up the necessary DI container for the function.
-    /// Any function-specific registration and configuration should be done in the derived class.
-    /// </summary>
     [ExcludeFromCodeCoverage]
     public abstract class BaseFunction
     {
@@ -43,10 +38,6 @@ namespace CautionaryAlertsListener
             services.AddLogCallAspect();
 
             ConfigureServices(services);
-
-            // TODO - Remove if not using DynamoDb
-            if (Configuration.GetValue<bool>("DynamoDb_LocalMode"))
-                AWSXRayRecorder.Instance.ContextMissingStrategy = ContextMissingStrategy.LOG_ERROR;
 
             ServiceProvider = services.BuildServiceProvider();
             ServiceProvider.UseLogCall();

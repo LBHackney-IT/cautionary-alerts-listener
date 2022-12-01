@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace CautionaryAlertsListener.UseCase
 {
-    public class DoSomethingUseCase : IDoSomethingUseCase
+    public class AddPersonToTenureUseCase : IAddPersonToTenureUseCase
     {
-        private readonly IDbEntityGateway _gateway;
+        private readonly ICautionaryAlertGateway _gateway;
 
-        public DoSomethingUseCase(IDbEntityGateway gateway)
+        public AddPersonToTenureUseCase(ICautionaryAlertGateway gateway)
         {
             _gateway = gateway;
         }
@@ -24,13 +24,11 @@ namespace CautionaryAlertsListener.UseCase
             if (message is null) throw new ArgumentNullException(nameof(message));
 
             // TODO - Implement use case logic
-            DomainEntity entity = await _gateway.GetEntityAsync(message.EntityId).ConfigureAwait(false);
+            var entity = await _gateway.GetEntityByMMHAsync(message.EntityId).ConfigureAwait(false);
             if (entity is null) throw new EntityNotFoundException<DomainEntity>(message.EntityId);
 
-            entity.Description = "Updated";
-
             // Save updated entity
-            await _gateway.SaveEntityAsync(entity).ConfigureAwait(false);
+            await _gateway.UpdateEntityAsync(entity).ConfigureAwait(false);
         }
     }
 }
