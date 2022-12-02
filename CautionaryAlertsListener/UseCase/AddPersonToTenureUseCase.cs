@@ -35,13 +35,13 @@ namespace CautionaryAlertsListener.UseCase
             if (tenure is null) throw new EntityNotFoundException<TenureInformation>(message.EntityId);
 
             var householdMember = GetAddedOrUpdatedHouseholdMember(message.EventData);
-            var entity = (await _gateway.GetEntitiesByMMHAndTenureAsync(householdMember.Id, tenure.TenuredAsset.Id))
+            var entity = (await _gateway.GetEntitiesByMMHAndTenureAsync(householdMember.Id, tenure.Id))
                 .FirstOrDefault();
 
             if (entity is null) throw new EntityNotFoundException<PropertyAlert>(message.EntityId);
 
             entity.Address = tenure.TenuredAsset.FullAddress;
-            entity.PropertyReference = tenure.TenuredAsset.Id;
+            entity.PropertyReference = tenure.Id;
             entity.UPRN = tenure.TenuredAsset.Uprn;
 
             await _gateway.UpdateEntityAsync(entity).ConfigureAwait(false);
@@ -49,17 +49,10 @@ namespace CautionaryAlertsListener.UseCase
 
         private static HouseholdMembers GetAddedOrUpdatedHouseholdMember(EventData eventData)
         {
-            var oldHms = GetHouseholdMembersFromEventData(eventData.OldData);
-            var newHms = GetHouseholdMembersFromEventData(eventData.NewData);
+            var oldHms = Helpers.GetHouseholdMembersFromEventData(eventData.OldData);
+            var newHms = Helpers.GetHouseholdMembersFromEventData(eventData.NewData);
 
             return newHms.Except(oldHms).FirstOrDefault();
-        }
-
-        private static List<HouseholdMembers> GetHouseholdMembersFromEventData(object data)
-        {
-            var dataDic = (data is Dictionary<string, object>) ? data as Dictionary<string, object> : ObjectFactory.ConvertFromObject<Dictionary<string, object>>(data);
-            var hmsObj = dataDic["householdMembers"];
-            return (hmsObj is List<HouseholdMembers>) ? hmsObj as List<HouseholdMembers> : ObjectFactory.ConvertFromObject<List<HouseholdMembers>>(hmsObj);
         }
     }
 }
