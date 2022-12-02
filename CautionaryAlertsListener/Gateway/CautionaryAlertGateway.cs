@@ -43,16 +43,6 @@ namespace CautionaryAlertsListener.Gateway
         }
 
         [LogCall]
-        public async Task<PropertyAlert> GetEntityByTenureAndNameAsync(string tenureId, string personName)
-        {
-            _logger.LogDebug($"Calling Postgres for tenureId {tenureId} and name {personName}");
-            var dbEntity = await _cautionaryAlertDbContext.PropertyAlerts
-                .FirstOrDefaultAsync(x => x.PropertyReference == tenureId && x.PersonName == personName)
-                .ConfigureAwait(false);
-            return dbEntity;
-        }
-
-        [LogCall]
         public async Task UpdateEntityAsync(PropertyAlert entity)
         {
             _logger.LogDebug($"Calling Postgres.SaveAsync for mmhId {entity.MMHID}");
