@@ -8,8 +8,7 @@ namespace CautionaryAlertsListener.Gateway.Interfaces
 {
     public interface ICautionaryAlertGateway
     {
-        Task<ICollection<PropertyAlert>> GetEntitiesByMMHAsync(string mmhId);
-        Task<PropertyAlert> GetEntityByTenureAndNameAsync(string tenureId, string personName);        
+        Task<ICollection<PropertyAlert>> GetEntitiesByMMHAndTenureAsync(string mmhId, string tenureId = null);       
         Task UpdateEntityAsync(PropertyAlert entity);
         Task UpdateEntitiesAsync(IEnumerable<PropertyAlert> propertyAlerts);
     }

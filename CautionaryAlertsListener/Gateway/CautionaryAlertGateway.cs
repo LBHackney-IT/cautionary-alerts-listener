@@ -26,14 +26,20 @@ namespace CautionaryAlertsListener.Gateway
         }
 
         [LogCall]
-        public async Task<ICollection<PropertyAlert>> GetEntitiesByMMHAsync(string mmhId)
+        public async Task<ICollection<PropertyAlert>> GetEntitiesByMMHAndTenureAsync(string mmhId, string tenureId = null)
         {
             _logger.LogDebug($"Calling Postgres for mmhId {mmhId}");
-            var dbEntity = await _cautionaryAlertDbContext.PropertyAlerts
-                .Where(x => x.MMHID == mmhId)
+            var query = _cautionaryAlertDbContext.PropertyAlerts
+                .Where(x => x.MMHID == mmhId);
+
+            if (!string.IsNullOrWhiteSpace(tenureId))
+            {
+                query = query.Where(x => x.PropertyReference == tenureId);
+            }
+
+            return await query
                 .ToListAsync()
                 .ConfigureAwait(false);
-            return dbEntity;
         }
 
         [LogCall]
