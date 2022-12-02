@@ -41,6 +41,8 @@ namespace CautionaryAlertsListener
             services.AddScoped<IRemovePersonFromTenureUseCase, RemovePersonFromTenureUseCase>();
             services.AddScoped<IPersonUpdatedUseCase, PersonUpdatedUseCase>();
             services.AddScoped<ICautionaryAlertGateway, CautionaryAlertGateway>();
+            services.AddScoped<ITenureApiGateway, TenureApiGateway>();
+
             ConfigureDbContext(services);
 
             base.ConfigureServices(services);
