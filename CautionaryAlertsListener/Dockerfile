@@ -7,8 +7,8 @@ WORKDIR /app
 # Copy csproj and NUGet.Config and restore as distinct layers
 COPY ./CautionaryAlertsListener/CautionaryAlertsListener.csproj ./
 COPY /NuGet.Config /root/.nuget/NuGet/NuGet.Config
-RUN dotnet restore ./CautionaryAlertsListener.csproj
 
+RUN dotnet restore ./CautionaryAlertsListener.csproj
 
 # Copy everything else and build
 COPY ./CautionaryAlertsListener ./
