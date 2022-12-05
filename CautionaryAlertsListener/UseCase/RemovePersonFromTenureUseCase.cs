@@ -8,6 +8,7 @@ using System;
 using CautionaryAlertsListener.Gateway.Interfaces;
 using CautionaryAlertsListener.Infrastructure;
 using System.Linq;
+using Hackney.Core.Sns;
 
 namespace CautionaryAlertsListener.UseCase
 {

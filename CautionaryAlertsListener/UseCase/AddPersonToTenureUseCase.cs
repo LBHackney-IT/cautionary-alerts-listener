@@ -7,6 +7,7 @@ using CautionaryAlertsListener.Infrastructure;
 using CautionaryAlertsListener.Infrastructure.Exceptions;
 using CautionaryAlertsListener.UseCase.Interfaces;
 using Hackney.Core.Logging;
+using Hackney.Core.Sns;
 using System;
 using System.Collections.Generic;
 using System.Linq;

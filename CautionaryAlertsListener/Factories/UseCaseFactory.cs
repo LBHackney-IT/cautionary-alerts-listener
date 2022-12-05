@@ -1,5 +1,5 @@
-using CautionaryAlertsListener.Boundary;
 using CautionaryAlertsListener.UseCase.Interfaces;
+using Hackney.Core.Sns;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
