@@ -33,6 +33,9 @@ namespace CautionaryAlertsListener.UseCase
 
             var householdMember = GetRemovedHouseholdMember(message.EventData);
             var entity = await _gateway.GetEntitiesByMMHAndTenureAsync(householdMember.Id, tenure.Id);
+
+            if (entity is null) return;
+
             await _gateway.DeleteEntityAsync(entity.FirstOrDefault());
         }
 

@@ -35,7 +35,6 @@ namespace CautionaryAlertsListener
             services.AddSingleton<IConfiguration>(Configuration);
 
             services.ConfigureLambdaLogging(Configuration);
-            services.AddLogCallAspect();
 
             ConfigureServices(services);
 

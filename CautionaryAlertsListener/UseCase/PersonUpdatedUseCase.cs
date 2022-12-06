@@ -1,5 +1,3 @@
-using CautionaryAlertsListener.Boundary;
-using CautionaryAlertsListener.Domain;
 using CautionaryAlertsListener.Gateway.Interfaces;
 using CautionaryAlertsListener.Infrastructure.Exceptions;
 using CautionaryAlertsListener.UseCase.Interfaces;
@@ -7,9 +5,10 @@ using Hackney.Core.Logging;
 using System.Threading.Tasks;
 using System;
 using CautionaryAlertsListener.Infrastructure;
-using System.Collections;
 using System.Collections.Generic;
 using Hackney.Core.Sns;
+using Microsoft.EntityFrameworkCore.Internal;
+using System.Linq;
 
 namespace CautionaryAlertsListener.UseCase
 {
@@ -28,7 +27,7 @@ namespace CautionaryAlertsListener.UseCase
             if (message is null) throw new ArgumentNullException(nameof(message));
 
             var entityCollection = await _gateway.GetEntitiesByMMHAndTenureAsync(message.EntityId.ToString()).ConfigureAwait(false);
-            if (entityCollection is null) throw new EntityNotFoundException<PropertyAlert>(message.EntityId);
+            if (entityCollection is null || entityCollection.Any()) return;
 
             var objectProps = message.EventData.NewData.GetType().GetProperties();
             var collectionToUpdate = new List<PropertyAlert>();

@@ -36,10 +36,12 @@ namespace CautionaryAlertsListener.UseCase
             if (tenure is null) throw new EntityNotFoundException<TenureInformation>(message.EntityId);
 
             var householdMember = GetAddedOrUpdatedHouseholdMember(message.EventData);
+            if (householdMember is null) throw new HouseholdMembersNotChangedException(message.EntityId, message.CorrelationId);
+
             var entity = (await _gateway.GetEntitiesByMMHAndTenureAsync(householdMember.Id, tenure.Id))
                 .FirstOrDefault();
 
-            if (entity is null) throw new EntityNotFoundException<PropertyAlert>(message.EntityId);
+            if (entity is null) return;
 
             entity.Address = tenure.TenuredAsset.FullAddress;
             entity.PropertyReference = tenure.Id;

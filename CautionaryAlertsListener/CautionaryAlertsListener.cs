@@ -75,8 +75,6 @@ namespace CautionaryAlertsListener
                     else
                         Logger.LogInformation($"No processors available for message so it will be ignored. " +
                             $"Message id: {message.MessageId}; type: {entityEvent.EventType}; version: {entityEvent.Version}; entity id: {entityEvent.EntityId}");
-
-                    await processor.ProcessMessageAsync(entityEvent).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
