@@ -38,8 +38,7 @@ namespace CautionaryAlertsListener.UseCase
             var householdMember = GetAddedOrUpdatedHouseholdMember(message.EventData);
             if (householdMember is null) throw new HouseholdMembersNotChangedException(message.EntityId, message.CorrelationId);
 
-            var entity = (await _gateway.GetEntitiesByMMHAndTenureAsync(householdMember.Id, tenure.Id))
-                .FirstOrDefault();
+            var entity = (await _gateway.GetEntitiesByMMHAndTenureAsync(householdMember.Id, tenure.Id).ConfigureAwait(false))?.FirstOrDefault();
 
             if (entity is null) return;
 
