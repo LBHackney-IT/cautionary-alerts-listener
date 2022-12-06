@@ -1,7 +1,7 @@
 using AutoFixture;
-using CautionaryAlertsListener.Boundary;
 using CautionaryAlertsListener.Domain;
 using Force.DeepCloner;
+using Hackney.Core.Sns;
 using Hackney.Core.Testing.Shared.E2E;
 using System;
 using System.Collections.Generic;

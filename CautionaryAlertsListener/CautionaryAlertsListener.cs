@@ -9,6 +9,7 @@ using CautionaryAlertsListener.UseCase;
 using CautionaryAlertsListener.UseCase.Interfaces;
 using Hackney.Core.DynamoDb;
 using Hackney.Core.Logging;
+using Hackney.Core.Sns;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

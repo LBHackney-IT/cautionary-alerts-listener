@@ -51,8 +51,6 @@
   <ItemGroup>
     <Folder Include="E2ETests\Steps\" />
     <Folder Include="E2ETests\Stories\" />
-    <Folder Include="Factories\" />
-    <Folder Include="Gateway\" />
-    <Folder Include="UseCase\" />
+     <Folder Include="Gateway\" />
   </ItemGroup>
 </Project>
