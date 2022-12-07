@@ -9,6 +9,5 @@ namespace CautionaryAlertsListener.Gateway.Interfaces
         Task<ICollection<PropertyAlertNew>> GetEntitiesByMMHAndPropertyReferenceAsync(string mmhId, string tenureId = null);       
         Task UpdateEntityAsync(PropertyAlertNew entity);
         Task UpdateEntitiesAsync(IEnumerable<PropertyAlertNew> propertyAlerts);
-        Task DeleteEntityAsync(PropertyAlertNew entity);
     }
 }

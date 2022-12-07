@@ -35,7 +35,11 @@ namespace CautionaryAlertsListener.UseCase
 
             if (entity is null) return;
 
-            await _gateway.DeleteEntityAsync(entity);
+            entity.Address = null;
+            entity.PropertyReference = null;
+            entity.UPRN = null;
+
+            await _gateway.UpdateEntityAsync(entity).ConfigureAwait(false);
         }
 
         private static HouseholdMembers GetRemovedHouseholdMember(EventData eventData)

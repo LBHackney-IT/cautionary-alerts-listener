@@ -56,13 +56,5 @@ namespace CautionaryAlertsListener.Gateway
 
             await _cautionaryAlertDbContext.SaveChangesAsync().ConfigureAwait(false);
         }
-
-        [LogCall]
-        public async Task DeleteEntityAsync(PropertyAlertNew entity)
-        {
-            _logger.LogDebug($"Deleting Postgres entity for mmhId {entity.MMHID} with property reference {entity.PropertyReference}");
-            _cautionaryAlertDbContext.PropertyAlerts.Remove(entity);
-            await _cautionaryAlertDbContext.SaveChangesAsync().ConfigureAwait(false);
-        }
     }
 }
