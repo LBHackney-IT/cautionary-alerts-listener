@@ -5,6 +5,7 @@ using CautionaryAlertsListener.Factories;
 using CautionaryAlertsListener.Gateway.Interfaces;
 using CautionaryAlertsListener.Infrastructure;
 using Hackney.Core.Logging;
+using Hackney.Shared.CautionaryAlerts.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -26,7 +27,7 @@ namespace CautionaryAlertsListener.Gateway
         }
 
         [LogCall]
-        public async Task<ICollection<PropertyAlert>> GetEntitiesByMMHAndTenureAsync(string mmhId, string tenureId = null)
+        public async Task<ICollection<PropertyAlertNew>> GetEntitiesByMMHAndTenureAsync(string mmhId, string tenureId = null)
         {
             _logger.LogDebug($"Calling Postgres for mmhId {mmhId}");
             var query = _cautionaryAlertDbContext.PropertyAlerts
@@ -43,7 +44,7 @@ namespace CautionaryAlertsListener.Gateway
         }
 
         [LogCall]
-        public async Task UpdateEntityAsync(PropertyAlert entity)
+        public async Task UpdateEntityAsync(PropertyAlertNew entity)
         {
             _logger.LogDebug($"Calling Postgres.SaveAsync for mmhId {entity.MMHID}");
             _cautionaryAlertDbContext.PropertyAlerts.Update(entity);
@@ -51,7 +52,7 @@ namespace CautionaryAlertsListener.Gateway
         }
 
         [LogCall]
-        public async Task UpdateEntitiesAsync(IEnumerable<PropertyAlert> propertyAlerts)
+        public async Task UpdateEntitiesAsync(IEnumerable<PropertyAlertNew> propertyAlerts)
         {
             _logger.LogDebug($"Calling Postgres.SaveAsync for mmhId {string.Join(',', propertyAlerts.Select(x => x.MMHID))}");
 
@@ -62,9 +63,9 @@ namespace CautionaryAlertsListener.Gateway
         }
 
         [LogCall]
-        public async Task DeleteEntityAsync(PropertyAlert entity)
+        public async Task DeleteEntityAsync(PropertyAlertNew entity)
         {
-            _logger.LogDebug($"Deleting Postgres entity for mmhId {entity.MMHID} with tenureId {entity.PropertyReference}");
+            _logger.LogDebug($"Deleting Postgres entity for mmhId {entity.MMHID} with property reference {entity.PropertyReference}");
             _cautionaryAlertDbContext.PropertyAlerts.Remove(entity);
             await _cautionaryAlertDbContext.SaveChangesAsync().ConfigureAwait(false);
         }

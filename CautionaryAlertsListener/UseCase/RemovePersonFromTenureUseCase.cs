@@ -32,11 +32,11 @@ namespace CautionaryAlertsListener.UseCase
             if (tenure is null) throw new EntityNotFoundException<TenureInformation>(message.EntityId);
 
             var householdMember = GetRemovedHouseholdMember(message.EventData);
-            var entity = await _gateway.GetEntitiesByMMHAndTenureAsync(householdMember.Id, tenure.Id);
+            var entity = (await _gateway.GetEntitiesByMMHAndTenureAsync(householdMember.Id, tenure.Id))?.FirstOrDefault();
 
             if (entity is null) return;
 
-            await _gateway.DeleteEntityAsync(entity.FirstOrDefault());
+            await _gateway.DeleteEntityAsync(entity);
         }
 
         private static HouseholdMembers GetRemovedHouseholdMember(EventData eventData)

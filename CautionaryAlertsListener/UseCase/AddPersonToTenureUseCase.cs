@@ -42,8 +42,9 @@ namespace CautionaryAlertsListener.UseCase
 
             if (entity is null) return;
 
+            // it should be updated only if there is a person-to-tenure record in posgtres db
             entity.Address = tenure.TenuredAsset.FullAddress;
-            entity.PropertyReference = tenure.Id;
+            entity.PropertyReference = tenure.TenuredAsset.Id;
             entity.UPRN = tenure.TenuredAsset.Uprn;
 
             await _gateway.UpdateEntityAsync(entity).ConfigureAwait(false);

@@ -1,3 +1,4 @@
+using Hackney.Shared.CautionaryAlerts.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace CautionaryAlertsListener.Infrastructure
@@ -8,6 +9,6 @@ namespace CautionaryAlertsListener.Infrastructure
         {
         }
 
-        public DbSet<PropertyAlert> PropertyAlerts { get; set; }
+        public DbSet<PropertyAlertNew> PropertyAlerts { get; set; }
     }
 }

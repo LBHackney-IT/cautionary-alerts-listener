@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using Hackney.Core.Sns;
 using Microsoft.EntityFrameworkCore.Internal;
 using System.Linq;
+using Hackney.Shared.CautionaryAlerts.Infrastructure;
 
 namespace CautionaryAlertsListener.UseCase
 {
@@ -27,17 +28,20 @@ namespace CautionaryAlertsListener.UseCase
             if (message is null) throw new ArgumentNullException(nameof(message));
 
             var entityCollection = await _gateway.GetEntitiesByMMHAndTenureAsync(message.EntityId.ToString()).ConfigureAwait(false);
-            if (entityCollection is null || entityCollection.Any()) return;
+            if (entityCollection is null || !entityCollection.Any()) return;
 
             var objectProps = message.EventData.NewData.GetType().GetProperties();
-            var collectionToUpdate = new List<PropertyAlert>();
+            var collectionToUpdate = new List<PropertyAlertNew>();
             foreach (var entity in entityCollection)
             {
                 foreach (var property in objectProps)
                 {
                     var newValue = property.GetValue(message.EventData.NewData).ToString();
                     var oldValue = property.GetValue(message.EventData.OldData).ToString();
-                    entity.PersonName = entity.PersonName.Replace(oldValue, newValue);
+                    if (!newValue.Equals(oldValue))
+                    {
+                        entity.PersonName = entity.PersonName.Replace(oldValue, newValue);
+                    }
                 }
 
                 collectionToUpdate.Add(entity);
