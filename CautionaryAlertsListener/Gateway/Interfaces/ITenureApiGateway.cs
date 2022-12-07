@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using System;
-using CautionaryAlertsListener.Domain;
+using Hackney.Shared.Tenure.Domain;
 
 namespace CautionaryAlertsListener.Gateway.Interfaces
 {

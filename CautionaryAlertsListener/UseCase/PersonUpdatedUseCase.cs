@@ -27,7 +27,7 @@ namespace CautionaryAlertsListener.UseCase
         {
             if (message is null) throw new ArgumentNullException(nameof(message));
 
-            var entityCollection = await _gateway.GetEntitiesByMMHAndTenureAsync(message.EntityId.ToString()).ConfigureAwait(false);
+            var entityCollection = await _gateway.GetEntitiesByMMHAndPropertyReferenceAsync(message.EntityId.ToString()).ConfigureAwait(false);
             if (entityCollection is null || !entityCollection.Any()) return;
 
             var objectProps = message.EventData.NewData.GetType().GetProperties();

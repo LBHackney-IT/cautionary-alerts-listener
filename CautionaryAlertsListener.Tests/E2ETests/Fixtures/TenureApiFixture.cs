@@ -1,8 +1,8 @@
 using AutoFixture;
-using CautionaryAlertsListener.Domain;
 using Force.DeepCloner;
 using Hackney.Core.Sns;
 using Hackney.Core.Testing.Shared.E2E;
+using Hackney.Shared.Tenure.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,9 +36,9 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
         private List<HouseholdMembers> CreateHouseholdMembers(int count = 3)
         {
             return _fixture.Build<HouseholdMembers>()
-                           .With(x => x.Id, () => Guid.NewGuid().ToString())
-                           .With(x => x.DateOfBirth, DateTime.UtcNow.AddYears(-40).ToString(DateFormat))
-                           .With(x => x.PersonTenureType, "Tenant")
+                           .With(x => x.Id, () => Guid.NewGuid())
+                           .With(x => x.DateOfBirth, DateTime.UtcNow.AddYears(-40))
+                           .With(x => x.PersonTenureType, PersonTenureType.Tenant)
                            .CreateMany(count).ToList();
         }
 
@@ -49,7 +49,7 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
 
             var newHm = CreateHouseholdMembers(1).First();
             newData.Add(newHm);
-            AddedPersonId = Guid.Parse(newHm.Id);
+            AddedPersonId = newHm.Id;
 
             MessageEventData = new EventData()
             {
@@ -64,7 +64,7 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
             var newData = oldData.DeepClone();
 
             var removedHm = CreateHouseholdMembers(1).First();
-            removedHm.Id = id.ToString();
+            removedHm.Id = id;
             oldData.Add(removedHm);
             RemovedPersonId = id;
 
@@ -92,16 +92,16 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
         public TenureInformation GivenTheTenureExists(Guid id, Guid? personId)
         {
             ResponseObject = _fixture.Build<TenureInformation>()
-                                     .With(x => x.Id, id.ToString())
-                                     .With(x => x.StartOfTenureDate, DateTime.UtcNow.AddMonths(-6).ToString(DateFormat))
-                                     .With(x => x.EndOfTenureDate, DateTime.UtcNow.AddYears(6).ToString(DateFormat))
+                                     .With(x => x.Id, id)
+                                     .With(x => x.StartOfTenureDate, DateTime.UtcNow.AddMonths(-6))
+                                     .With(x => x.EndOfTenureDate, DateTime.UtcNow.AddYears(6))
                                      .With(x => x.HouseholdMembers, CreateHouseholdMembers())
                                      .Create();
 
             if (personId.HasValue)
-                ResponseObject.HouseholdMembers.First().Id = personId.ToString();
+                ResponseObject.HouseholdMembers.First().Id = personId.Value;
 
-            CreateMessageEventDataForPersonAdded(ResponseObject.HouseholdMembers);
+            CreateMessageEventDataForPersonAdded(ResponseObject.HouseholdMembers.ToList());
             return ResponseObject;
         }
     }

@@ -1,9 +1,9 @@
-using CautionaryAlertsListener.Domain;
 using CautionaryAlertsListener.Gateway.Interfaces;
 using Hackney.Core.Logging;
 using System.Threading.Tasks;
 using System;
 using Hackney.Core.Http;
+using Hackney.Shared.Tenure.Domain;
 
 namespace CautionaryAlertsListener.Gateway
 {

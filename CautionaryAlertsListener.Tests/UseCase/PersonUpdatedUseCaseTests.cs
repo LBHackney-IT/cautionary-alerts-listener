@@ -1,7 +1,5 @@
 using AutoFixture;
-using CautionaryAlertsListener.Domain;
 using CautionaryAlertsListener.Gateway.Interfaces;
-using CautionaryAlertsListener.Infrastructure;
 using CautionaryAlertsListener.UseCase;
 using FluentAssertions;
 using Force.DeepCloner;
@@ -72,7 +70,7 @@ namespace CautionaryAlertsListener.Tests.UseCase
         {
             _message = SetMessageEventData(_message);
             var mmhId = _message.Id;
-            _mockGateway.Setup(x => x.GetEntitiesByMMHAndTenureAsync(It.IsAny<Guid>().ToString(), null))
+            _mockGateway.Setup(x => x.GetEntitiesByMMHAndPropertyReferenceAsync(It.IsAny<Guid>().ToString(), null))
                 .ReturnsAsync(new List<PropertyAlertNew>());
 
             Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
@@ -84,7 +82,7 @@ namespace CautionaryAlertsListener.Tests.UseCase
         public void ProcessMessageAsyncTestPersonFoundCallsUpdateEntity()
         {
             _message = SetMessageEventData(_message);
-            _mockGateway.Setup(x => x.GetEntitiesByMMHAndTenureAsync(It.IsAny<string>(), It.IsAny<string>()))
+            _mockGateway.Setup(x => x.GetEntitiesByMMHAndPropertyReferenceAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new List<PropertyAlertNew>() { _fixture.Build<PropertyAlertNew>()
                 .With(x => x.PersonName, $"{_personData.FirstName} {_personData.LastName}")
                 .Create()});

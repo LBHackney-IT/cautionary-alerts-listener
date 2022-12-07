@@ -1,5 +1,5 @@
-using CautionaryAlertsListener.Domain;
 using CautionaryAlertsListener.Factories;
+using Hackney.Shared.Tenure.Domain;
 using System.Collections.Generic;
 
 namespace CautionaryAlertsListener.Infrastructure

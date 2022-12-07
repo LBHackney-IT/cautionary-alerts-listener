@@ -1,14 +1,9 @@
-using Amazon.DynamoDBv2.Model;
-using Amazon.XRay.Recorder.Core.Internal.Entities;
-using CautionaryAlertsListener.Domain;
-using CautionaryAlertsListener.Factories;
 using CautionaryAlertsListener.Gateway.Interfaces;
 using CautionaryAlertsListener.Infrastructure;
 using Hackney.Core.Logging;
 using Hackney.Shared.CautionaryAlerts.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,15 +22,15 @@ namespace CautionaryAlertsListener.Gateway
         }
 
         [LogCall]
-        public async Task<ICollection<PropertyAlertNew>> GetEntitiesByMMHAndTenureAsync(string mmhId, string tenureId = null)
+        public async Task<ICollection<PropertyAlertNew>> GetEntitiesByMMHAndPropertyReferenceAsync(string mmhId, string propertyReference = null)
         {
             _logger.LogDebug($"Calling Postgres for mmhId {mmhId}");
             var query = _cautionaryAlertDbContext.PropertyAlerts
                 .Where(x => x.MMHID == mmhId);
 
-            if (!string.IsNullOrWhiteSpace(tenureId))
+            if (!string.IsNullOrWhiteSpace(propertyReference))
             {
-                query = query.Where(x => x.PropertyReference == tenureId);
+                query = query.Where(x => x.PropertyReference == propertyReference);
             }
 
             return await query

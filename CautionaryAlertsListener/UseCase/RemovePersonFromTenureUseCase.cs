@@ -1,5 +1,3 @@
-using CautionaryAlertsListener.Boundary;
-using CautionaryAlertsListener.Domain;
 using CautionaryAlertsListener.Infrastructure.Exceptions;
 using CautionaryAlertsListener.UseCase.Interfaces;
 using Hackney.Core.Logging;
@@ -9,6 +7,7 @@ using CautionaryAlertsListener.Gateway.Interfaces;
 using CautionaryAlertsListener.Infrastructure;
 using System.Linq;
 using Hackney.Core.Sns;
+using Hackney.Shared.Tenure.Domain;
 
 namespace CautionaryAlertsListener.UseCase
 {
@@ -32,7 +31,7 @@ namespace CautionaryAlertsListener.UseCase
             if (tenure is null) throw new EntityNotFoundException<TenureInformation>(message.EntityId);
 
             var householdMember = GetRemovedHouseholdMember(message.EventData);
-            var entity = (await _gateway.GetEntitiesByMMHAndTenureAsync(householdMember.Id, tenure.Id))?.FirstOrDefault();
+            var entity = (await _gateway.GetEntitiesByMMHAndPropertyReferenceAsync(householdMember.Id.ToString(), tenure.TenuredAsset.PropertyReference))?.FirstOrDefault();
 
             if (entity is null) return;
 

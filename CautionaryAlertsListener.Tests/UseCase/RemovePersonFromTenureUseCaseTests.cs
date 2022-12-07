@@ -1,5 +1,4 @@
 using AutoFixture;
-using CautionaryAlertsListener.Domain;
 using CautionaryAlertsListener.Infrastructure.Exceptions;
 using Hackney.Core.Sns;
 using Moq;
@@ -14,6 +13,7 @@ using Force.DeepCloner;
 using FluentAssertions;
 using CautionaryAlertsListener.Infrastructure;
 using Hackney.Shared.CautionaryAlerts.Infrastructure;
+using Hackney.Shared.Tenure.Domain;
 
 namespace CautionaryAlertsListener.Tests.UseCase
 {
@@ -39,13 +39,13 @@ namespace CautionaryAlertsListener.Tests.UseCase
             _sut = new RemovePersonFromTenureUseCase(_mockGateway.Object, _mockTenureApi.Object);
 
             _tenure = CreateTenure();
-            _message = CreateMessage(Guid.Parse(_tenure.Id));
+            _message = CreateMessage(_tenure.Id);
         }
 
         private TenureInformation CreateTenure()
         {
             return _fixture.Build<TenureInformation>()
-                           .With(x => x.Id, _fixture.Create<Guid>().ToString())
+                           .With(x => x.Id, _fixture.Create<Guid>())
                            .With(x => x.HouseholdMembers, _fixture.Build<HouseholdMembers>()
                                                                   .CreateMany(3).ToList())
                            .Create();
@@ -62,19 +62,19 @@ namespace CautionaryAlertsListener.Tests.UseCase
 
         private Guid? SetMessageEventData(TenureInformation tenure, EntityEventSns message)
         {
-            var oldData = tenure.HouseholdMembers;
-            var newData = oldData.DeepClone();
+            var oldData = tenure.HouseholdMembers.ToList();
+            var newData = oldData.DeepClone().ToList();
             message.EventData = new EventData()
             {
                 OldData = new Dictionary<string, object> { { "householdMembers", oldData } },
                 NewData = new Dictionary<string, object> { { "householdMembers", newData } }
             };
             var removedHm = _fixture.Build<HouseholdMembers>()
-                                    .With(x => x.Id, Guid.NewGuid().ToString())
+                                    .With(x => x.Id, Guid.NewGuid())
                                     .Create();
             var personId = removedHm.Id;
             oldData.Add(removedHm);
-            return Guid.Parse(personId);
+            return personId;
         }
 
         [Fact]
@@ -121,7 +121,7 @@ namespace CautionaryAlertsListener.Tests.UseCase
         {
             SetMessageEventData(_tenure, _message);
 
-            _mockGateway.Setup(x => x.GetEntitiesByMMHAndTenureAsync(It.IsAny<Guid>().ToString(), null))
+            _mockGateway.Setup(x => x.GetEntitiesByMMHAndPropertyReferenceAsync(It.IsAny<Guid>().ToString(), null))
                 .ReturnsAsync((List<PropertyAlertNew>) null);
             _mockTenureApi.Setup(x => x.GetTenureByIdAsync(_message.EntityId, _message.CorrelationId))
                                        .ReturnsAsync(_tenure);
@@ -137,7 +137,7 @@ namespace CautionaryAlertsListener.Tests.UseCase
             SetMessageEventData(_tenure, _message);
 
             _mockTenureApi.Setup(x => x.GetTenureByIdAsync(It.IsAny<Guid>(), _correlationId)).ReturnsAsync(_tenure);
-            _mockGateway.Setup(x => x.GetEntitiesByMMHAndTenureAsync(It.IsAny<string>(), It.IsAny<string>()))
+            _mockGateway.Setup(x => x.GetEntitiesByMMHAndPropertyReferenceAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new List<PropertyAlertNew>() { _fixture.Create<PropertyAlertNew>() });
 
             var exMsg = "This is the last error";
@@ -156,7 +156,7 @@ namespace CautionaryAlertsListener.Tests.UseCase
             SetMessageEventData(_tenure, _message);
 
             _mockTenureApi.Setup(x => x.GetTenureByIdAsync(It.IsAny<Guid>(), _correlationId)).ReturnsAsync(_tenure);
-            _mockGateway.Setup(x => x.GetEntitiesByMMHAndTenureAsync(It.IsAny<string>(), It.IsAny<string>()))
+            _mockGateway.Setup(x => x.GetEntitiesByMMHAndPropertyReferenceAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new List<PropertyAlertNew>() { _fixture.Create<PropertyAlertNew>() });
 
             await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);

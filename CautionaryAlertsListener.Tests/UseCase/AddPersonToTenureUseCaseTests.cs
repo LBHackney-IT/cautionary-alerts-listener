@@ -1,13 +1,12 @@
 using AutoFixture;
-using CautionaryAlertsListener.Domain;
 using CautionaryAlertsListener.Gateway.Interfaces;
-using CautionaryAlertsListener.Infrastructure;
 using CautionaryAlertsListener.Infrastructure.Exceptions;
 using CautionaryAlertsListener.UseCase;
 using FluentAssertions;
 using Force.DeepCloner;
 using Hackney.Core.Sns;
 using Hackney.Shared.CautionaryAlerts.Infrastructure;
+using Hackney.Shared.Tenure.Domain;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -39,15 +38,15 @@ namespace CautionaryAlertsListener.Tests.UseCase
             _sut = new AddPersonToTenureUseCase(_mockGateway.Object, _mockTenureApi.Object);
 
             _tenure = CreateTenure();
-            _message = CreateMessage(Guid.Parse(_tenure.Id));
+            _message = CreateMessage(_tenure.Id);
         }
 
         private TenureInformation CreateTenure()
         {
             return _fixture.Build<TenureInformation>()
-                           .With(x => x.Id, It.IsAny<Guid>().ToString())
+                           .With(x => x.Id, It.IsAny<Guid>())
                            .With(x => x.HouseholdMembers, _fixture.Build<HouseholdMembers>()
-                                                                  .With(x => x.Id, It.IsAny<Guid>().ToString())
+                                                                  .With(x => x.Id, It.IsAny<Guid>())
                                                                   .CreateMany(3)
                                                                   .ToList())
                            .Create();
@@ -65,7 +64,7 @@ namespace CautionaryAlertsListener.Tests.UseCase
         private Guid? SetMessageEventData(TenureInformation tenure, EntityEventSns message, bool hasChanges, HouseholdMembers added = null)
         {
             var oldData = tenure.HouseholdMembers;
-            var newData = oldData.DeepClone();
+            var newData = oldData.DeepClone().ToList();
             message.EventData = new EventData()
             {
                 OldData = new Dictionary<string, object> { { "householdMembers", oldData } },
@@ -79,12 +78,12 @@ namespace CautionaryAlertsListener.Tests.UseCase
                 {
                     var changed = newData.First();
                     changed.FullName = "Updated name";
-                    personId = Guid.Parse(changed.Id);
+                    personId = changed.Id;
                 }
                 else
                 {
                     newData.Add(added);
-                    personId = Guid.Parse(added.Id);
+                    personId = added.Id;
                 }
             }
             return personId;
@@ -133,7 +132,7 @@ namespace CautionaryAlertsListener.Tests.UseCase
         public void ProcessMessageAsyncTestPersonIdNotFoundDoesNotCallUpdateEntity()
         {
             var personId = SetMessageEventData(_tenure, _message, true);
-            _mockGateway.Setup(x => x.GetEntitiesByMMHAndTenureAsync(It.IsAny<Guid>().ToString(), null))
+            _mockGateway.Setup(x => x.GetEntitiesByMMHAndPropertyReferenceAsync(It.IsAny<Guid>().ToString(), null))
                 .ReturnsAsync(new List<PropertyAlertNew>());
 
             _mockTenureApi.Setup(x => x.GetTenureByIdAsync(_message.EntityId, _message.CorrelationId))
@@ -147,7 +146,7 @@ namespace CautionaryAlertsListener.Tests.UseCase
         public void ProcessMessageAsyncTestPersonFoundCallsUpdateEntity()
         {
             var personId = SetMessageEventData(_tenure, _message, true);
-            _mockGateway.Setup(x => x.GetEntitiesByMMHAndTenureAsync(It.IsAny<string>(), It.IsAny<string>()))
+            _mockGateway.Setup(x => x.GetEntitiesByMMHAndPropertyReferenceAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new List<PropertyAlertNew>() { _fixture.Create<PropertyAlertNew>() });
 
             _mockTenureApi.Setup(x => x.GetTenureByIdAsync(_message.EntityId, _message.CorrelationId))
