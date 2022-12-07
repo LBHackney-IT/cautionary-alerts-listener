@@ -128,7 +128,7 @@ namespace CautionaryAlertsListener.Tests.UseCase
 
             Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
             func.Should().NotThrow();
-            _mockGateway.Verify(x => x.DeleteEntityAsync(It.IsAny<PropertyAlertNew>()), Times.Never);
+            _mockGateway.Verify(x => x.UpdateEntityAsync(It.IsAny<PropertyAlertNew>()), Times.Never);
         }
 
         [Fact]
@@ -141,17 +141,17 @@ namespace CautionaryAlertsListener.Tests.UseCase
                 .ReturnsAsync(new List<PropertyAlertNew>() { _fixture.Create<PropertyAlertNew>() });
 
             var exMsg = "This is the last error";
-            _mockGateway.Setup(x => x.DeleteEntityAsync(It.IsAny<PropertyAlertNew>()))
+            _mockGateway.Setup(x => x.UpdateEntityAsync(It.IsAny<PropertyAlertNew>()))
                         .ThrowsAsync(new Exception(exMsg));
 
             Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
             func.Should().ThrowAsync<Exception>().WithMessage(exMsg);
 
-            _mockGateway.Verify(x => x.DeleteEntityAsync(It.IsAny<PropertyAlertNew>()), Times.Once);
+            _mockGateway.Verify(x => x.UpdateEntityAsync(It.IsAny<PropertyAlertNew>()), Times.Once);
         }
 
         [Fact]
-        public async Task ProcessMessageAsyncSuccessCallsDeleteMethod()
+        public async Task ProcessMessageAsyncSuccessCallsUpdateMethod()
         {
             SetMessageEventData(_tenure, _message);
 
@@ -160,7 +160,7 @@ namespace CautionaryAlertsListener.Tests.UseCase
                 .ReturnsAsync(new List<PropertyAlertNew>() { _fixture.Create<PropertyAlertNew>() });
 
             await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
-            _mockGateway.Verify(x => x.DeleteEntityAsync(It.IsAny<PropertyAlertNew>()), Times.Once);
+            _mockGateway.Verify(x => x.UpdateEntityAsync(It.IsAny<PropertyAlertNew>()), Times.Once);
         }
     }
 }

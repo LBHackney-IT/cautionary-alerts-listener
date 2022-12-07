@@ -4,6 +4,7 @@ using Hackney.Core.Logging;
 using Hackney.Shared.CautionaryAlerts.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,6 +25,11 @@ namespace CautionaryAlertsListener.Gateway
         [LogCall]
         public async Task<ICollection<PropertyAlertNew>> GetEntitiesByMMHAndPropertyReferenceAsync(string mmhId, string propertyReference = null)
         {
+            if (string.IsNullOrEmpty(mmhId))
+            {
+                throw new ArgumentNullException(nameof(mmhId));
+            }
+
             _logger.LogDebug($"Calling Postgres for mmhId {mmhId}");
             var query = _cautionaryAlertDbContext.PropertyAlerts
                 .Where(x => x.MMHID == mmhId);

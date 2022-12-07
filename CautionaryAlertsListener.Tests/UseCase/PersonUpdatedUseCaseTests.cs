@@ -81,15 +81,20 @@ namespace CautionaryAlertsListener.Tests.UseCase
         [Fact]
         public void ProcessMessageAsyncTestPersonFoundCallsUpdateEntity()
         {
+            var response = new List<PropertyAlertNew>()
+                {
+                    _fixture.Build<PropertyAlertNew>()
+                        .With(x => x.PersonName, $"{_personData.FirstName} {_personData.LastName}")
+                        .Create()
+                };
             _message = SetMessageEventData(_message);
             _mockGateway.Setup(x => x.GetEntitiesByMMHAndPropertyReferenceAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new List<PropertyAlertNew>() { _fixture.Build<PropertyAlertNew>()
-                .With(x => x.PersonName, $"{_personData.FirstName} {_personData.LastName}")
-                .Create()});
+                .ReturnsAsync(response);
 
+            var verifyList = new List<PropertyAlertNew>() { It.IsAny<PropertyAlertNew>() };
             Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
             func.Should().NotThrow();
-            _mockGateway.Verify(x => x.UpdateEntitiesAsync(new List<PropertyAlertNew>() { It.IsAny<PropertyAlertNew>() }), Times.Once);
+            _mockGateway.Verify(x => x.UpdateEntitiesAsync(response), Times.Once);
         }
     }
 }
