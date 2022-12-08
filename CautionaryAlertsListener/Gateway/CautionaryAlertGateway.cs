@@ -1,3 +1,4 @@
+using Amazon.XRay.Recorder.Core.Internal.Entities;
 using CautionaryAlertsListener.Gateway.Interfaces;
 using CautionaryAlertsListener.Infrastructure;
 using Hackney.Core.Logging;
@@ -47,6 +48,11 @@ namespace CautionaryAlertsListener.Gateway
         [LogCall]
         public async Task UpdateEntityAsync(PropertyAlertNew entity)
         {
+            if (entity is null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+
             _logger.LogDebug($"Calling Postgres.SaveAsync for mmhId {entity.MMHID}");
             _cautionaryAlertDbContext.PropertyAlerts.Update(entity);
             await _cautionaryAlertDbContext.SaveChangesAsync().ConfigureAwait(false);
@@ -55,6 +61,11 @@ namespace CautionaryAlertsListener.Gateway
         [LogCall]
         public async Task UpdateEntitiesAsync(IEnumerable<PropertyAlertNew> propertyAlerts)
         {
+            if (propertyAlerts is null || !propertyAlerts.Any())
+            {
+                throw new ArgumentNullException(nameof(propertyAlerts));
+            }
+
             _logger.LogDebug($"Calling Postgres.SaveAsync for mmhId {string.Join(',', propertyAlerts.Select(x => x.MMHID))}");
 
             foreach (var propertyAlert in propertyAlerts)
