@@ -14,7 +14,9 @@
     <PackageReference Include="Amazon.Lambda.TestUtilities" Version="2.0.0" />
     <PackageReference Include="Amazon.Lambda.SQSEvents" Version="2.0.0" />
     <PackageReference Include="AutoFixture" Version="4.17.0" />
-      <PackageReference Include="DeepCloner" Version="0.10.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.12.0" />
+    <PackageReference Include="Bogus" Version="34.0.2" />
+    <PackageReference Include="DeepCloner" Version="0.10.2" />
     <PackageReference Include="coverlet.msbuild" Version="3.1.0">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -51,6 +53,5 @@
   <ItemGroup>
     <Folder Include="E2ETests\Steps\" />
     <Folder Include="E2ETests\Stories\" />
-     <Folder Include="Gateway\" />
   </ItemGroup>
 </Project>

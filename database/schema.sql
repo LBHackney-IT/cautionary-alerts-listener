@@ -629,7 +629,7 @@ create table dbo."PropertyAlertNew"(
 	"address" varchar(50),
 	"neighbourhood" varchar(20),
 	"date_of_incident" varchar(12),
-	"code" varchar(3),
+	"code" varchar(5),
 	"caution_on_system" varchar(50),
 	"property_reference" varchar(12),
 	"uprn" varchar(12),
