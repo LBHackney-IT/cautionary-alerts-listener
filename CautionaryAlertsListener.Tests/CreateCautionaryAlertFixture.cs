@@ -7,7 +7,7 @@ namespace CautionaryAlertsListener.Tests
 {
     public static class CreateCautionaryAlertFixture
     {
-        public static CreateCautionaryAlert GenerateValidCreateCautionaryAlertFixture(string defaultString, Fixture fixture)
+        public static CreateCautionaryAlert GenerateValidCreateCautionaryAlertFixture(string defaultString, Fixture fixture, Guid? mmhId = null, string propertyReference = null)
         {
             var alert = fixture.Build<Alert>()
                 .With(x => x.Code, defaultString[..CreateCautionaryAlertConstants.ALERTCODELENGTH])
@@ -18,9 +18,11 @@ namespace CautionaryAlertsListener.Tests
                 .With(x => x.FullAddress, defaultString[..CreateCautionaryAlertConstants.FULLADDRESSLENGTH])
                 .With(x => x.PropertyReference, defaultString[..CreateCautionaryAlertConstants.PROPERTYREFERENCELENGTH])
                 .With(x => x.UPRN, defaultString[..CreateCautionaryAlertConstants.UPRNLENGTH])
+                .With(x => x.PropertyReference, propertyReference ?? defaultString[..CreateCautionaryAlertConstants.PROPERTYREFERENCELENGTH])
                 .Create();
 
             var personDetails = fixture.Build<PersonDetails>()
+                .With(x => x.Id, mmhId ?? Guid.NewGuid())
                 .With(x => x.Name, defaultString[..CreateCautionaryAlertConstants.PERSONNAMELENGTH])
                 .Create();
 

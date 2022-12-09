@@ -28,26 +28,22 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Steps
             await TriggerFunction(message).ConfigureAwait(false);
         }
 
-        public void TheNoExceptionIsThrown()
+        public void ThenNoExceptionIsThrown()
         {
             _lastException.Should().BeNull();
         }
 
-        public async Task ThenThePersonNameIsUpdated(PropertyAlertNew originalAlertDb,
+        public void ThenNothingShouldBeDone()
+        { }
+
+
+        public async Task ThenThePersonNameIsUpdated(PropertyAlertNew originalCautionaryAlertDb,
                 PersonData personData, CautionaryAlertContext dbContext)
         {
-            await Task.FromResult(originalAlertDb);
-            return;
-            //var updatedAssetInDb = await <AssetDb>(originalAssetDb.Id);
+            var updatedCautionaryAlertInDb = await dbContext.PropertyAlerts.FindAsync(originalCautionaryAlertDb.Id);
 
-            //updatedAssetInDb.Should().BeEquivalentTo(originalAssetDb,
-            //    config => config.Excluding(y => y.Tenure)
-            //                    .Excluding(z => z.VersionNumber));
-            //updatedAssetInDb.Tenure.Should().BeEquivalentTo(originalAssetDb.Tenure,
-            //    config => config.Excluding(y => y.PaymentReference));
-
-            //updatedAssetInDb.Tenure.PaymentReference.Should().Be(account.PaymentReference);
-            //updatedAssetInDb.VersionNumber.Should().Be(originalAssetDb.VersionNumber + 1);
+            updatedCautionaryAlertInDb.Should().BeEquivalentTo(originalCautionaryAlertDb,
+                config => config.Excluding(y => y.PersonName));
         }
     }
 }

@@ -1,40 +1,31 @@
-using Amazon.DynamoDBv2;
 using CautionaryAlertsListener.Infrastructure;
-using Hackney.Core.DynamoDb;
-using Hackney.Core.Testing.DynamoDb;
-using Hackney.Core.Testing.Shared;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
 using System;
-using System.Collections.Generic;
-using System.Data.Common;
 
 namespace CautionaryAlertsListener.Tests
 {
-    // TODO - Remove DynamoDb parts if not required
-
     public class MockApplicationFactory
     {
-        private readonly DbConnection _connection;
+        private const string ConnectionString = "Host=localhost;Port=5432;Database=testdb;Username=postgres;Password=mypassword";
+        public CautionaryAlertContext CautionaryAlertContext { get; private set; }
 
-        public MockApplicationFactory(DbConnection connection)
+        public MockApplicationFactory()
         {
-            _connection = connection;
-            CreateHostBuilder().Build();
+            var dbBuilder = new DbContextOptionsBuilder();
+            dbBuilder.UseNpgsql(ConnectionString);
+            CautionaryAlertContext = new CautionaryAlertContext(dbBuilder.Options);
+            CreateHostBuilder(CautionaryAlertContext).Build();
         }
 
-        public IHostBuilder CreateHostBuilder() => Host.CreateDefaultBuilder(null)
+        public IHostBuilder CreateHostBuilder(CautionaryAlertContext context) => Host.CreateDefaultBuilder(null)
            .ConfigureAppConfiguration(b => b.AddEnvironmentVariables())
            .ConfigureServices((hostContext, services) =>
            {
-               var dbBuilder = new DbContextOptionsBuilder();
-               dbBuilder.UseNpgsql(_connection);
-               var context = new CautionaryAlertContext(dbBuilder.Options);
-               services.AddSingleton(context);
-
+               services.AddSingleton(CautionaryAlertContext);
                var serviceProvider = services.BuildServiceProvider();
                var dbContext = serviceProvider.GetRequiredService<CautionaryAlertContext>();
 

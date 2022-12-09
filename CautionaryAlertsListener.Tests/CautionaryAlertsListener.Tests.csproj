@@ -52,6 +52,5 @@
     
   <ItemGroup>
     <Folder Include="E2ETests\Steps\" />
-    <Folder Include="E2ETests\Stories\" />
   </ItemGroup>
 </Project>
