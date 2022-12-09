@@ -1,18 +1,22 @@
-using Amazon.DynamoDBv2.DataModel;
-using Amazon.DynamoDBv2.Model.Internal.MarshallTransformations;
 using Amazon.Lambda.SQSEvents;
+using AutoFixture;
 using CautionaryAlertsListener.Infrastructure;
-using CautionaryAlertsListener.Infrastructure.Exceptions;
 using FluentAssertions;
 using Hackney.Core.Sns;
 using Hackney.Shared.CautionaryAlerts.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Dynamic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CautionaryAlertsListener.Tests.E2ETests.Steps
 {
     public class PersonUpdatedSteps : BaseSteps
     {
+        public const string NewFirstName = "NewFirstName";
+        public const string NewLastName = "NewLastName";
+
         public PersonUpdatedSteps()
         {
             _eventType = EventTypes.PersonUpdatedEvent;
@@ -36,14 +40,34 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Steps
         public void ThenNothingShouldBeDone()
         { }
 
-
-        public async Task ThenThePersonNameIsUpdated(PropertyAlertNew originalCautionaryAlertDb,
-                PersonData personData, CautionaryAlertContext dbContext)
+        protected override EntityEventSns CreateEvent(Guid eventId, string eventType)
         {
-            var updatedCautionaryAlertInDb = await dbContext.PropertyAlerts.FindAsync(originalCautionaryAlertDb.Id);
+            dynamic oldData = new ExpandoObject();
+            oldData.firstName = CreateCautionaryAlertFixture.OldFirstName;
+            oldData.lastName = CreateCautionaryAlertFixture.OldLastName;
 
-            updatedCautionaryAlertInDb.Should().BeEquivalentTo(originalCautionaryAlertDb,
-                config => config.Excluding(y => y.PersonName));
+            dynamic newData = new ExpandoObject();
+            newData.firstName = NewFirstName;
+            newData.lastName = NewLastName;
+
+            return _fixture.Build<EntityEventSns>()
+                           .With(x => x.EntityId, eventId)
+                           .With(x => x.EventType, _eventType)
+                           .With(x => x.CorrelationId, _correlationId)
+                           .With(x => x.EventData, new EventData()
+                           {
+                               OldData = oldData,
+                               NewData = newData
+                           })
+                           .Create();
+        }
+
+        public void ThenThePersonNameIsUpdated(PropertyAlertNew originalCautionaryAlertDb, CautionaryAlertContext dbContext)
+        {
+            var updatedCautionaryAlertInDb = dbContext.PropertyAlerts.AsNoTracking().FirstOrDefault(x=> x.Id == originalCautionaryAlertDb.Id);
+            updatedCautionaryAlertInDb.Should().BeEquivalentTo(originalCautionaryAlertDb, config => config.Excluding(y => y.PersonName));
+            updatedCautionaryAlertInDb.PersonName.Should().StartWith(NewFirstName);
+            updatedCautionaryAlertInDb.PersonName.Should().EndWith(NewLastName);
         }
     }
 }

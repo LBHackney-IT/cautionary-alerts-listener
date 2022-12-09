@@ -43,27 +43,27 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
             }
         }
 
-        private PropertyAlertNew ConstructAndSaveCautionaryAlert(int id)
+        private PropertyAlertNew ConstructAndSaveCautionaryAlertMMHIDOptionalPropertyReference(Guid mmhId, string propertyReference = null)
         {
             var cautionaryAlert = CreateCautionaryAlertFixture
-                .GenerateValidCreateCautionaryAlertFixture(_defaultString, _fixture);
+                .GenerateValidCreateCautionaryAlertFixture(_defaultString, _fixture, mmhId, propertyReference);
             var dbEntity = cautionaryAlert.ToDatabase();
             _dbContext.PropertyAlerts.Add(dbEntity);
             _dbContext.SaveChanges();
             return dbEntity;
         }
 
-        public void GivenTheCautionaryAlertAlreadyExist(int id)
+        public void GivenTheCautionaryAlertAlreadyExist(Guid mmhId, string propertyReference = null)
         {
             if (null == DbEntity)
             {
-                var entity = ConstructAndSaveCautionaryAlert(id);
+                var entity = ConstructAndSaveCautionaryAlertMMHIDOptionalPropertyReference(mmhId, propertyReference);
                 DbEntity = entity;
                 DbEntityId = entity.Id;
             }
         }
 
-        public void GivenACautionaryAlertDoesNotExist(int id)
+        public void GivenACautionaryAlertDoesNotExistForPerson(Guid mmhId)
         {
             // Nothing to do here
         }

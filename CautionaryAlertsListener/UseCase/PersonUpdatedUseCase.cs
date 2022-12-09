@@ -43,7 +43,7 @@ namespace CautionaryAlertsListener.UseCase
                 {
                     var newValue = property.Value.ToString();
                     var oldValue = deresializedOldData[property.Name]?.ToString();
-                    if (!newValue.Equals(oldValue))
+                    if (!newValue.Equals(oldValue) || !(oldValue is null))
                     {
                         entity.PersonName = entity.PersonName.Replace(oldValue, newValue);
                     }

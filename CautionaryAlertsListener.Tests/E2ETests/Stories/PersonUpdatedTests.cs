@@ -2,8 +2,6 @@ using CautionaryAlertsListener.Infrastructure;
 using CautionaryAlertsListener.Tests.E2ETests.Fixtures;
 using CautionaryAlertsListener.Tests.E2ETests.Steps;
 using System;
-using System.CodeDom;
-using System.Data.Common;
 using TestStack.BDDfy;
 using Xunit;
 
@@ -51,7 +49,28 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Stories
             this.Given(g => _cautionaryAlertFixture.GivenACautionaryAlertDoesNotExistForPerson(mmhId))
                 .When(w => _steps.WhenTheFunctionIsTriggered(mmhId))
                 .Then(t => _steps.ThenNoExceptionIsThrown())
-                .Then(t => _steps.ThenNothingShouldBeDone());
+                .Then(t => _steps.ThenNothingShouldBeDone())
+            .BDDfy();
+        }
+
+        [Fact]
+        public void PropertyAlertForPersonFoundShouldUpdatePersonName()
+        {
+            var mmhId = Guid.NewGuid();
+
+            this.Given(g => _cautionaryAlertFixture.GivenTheCautionaryAlertAlreadyExist(mmhId, null))
+                .When(w => _steps.WhenTheFunctionIsTriggered(mmhId))
+                .Then(t => _steps.ThenNoExceptionIsThrown())
+                .Then(t => _steps.ThenThePersonNameIsUpdated(_cautionaryAlertFixture.DbEntity, _dbFixture))
+                .BDDfy();
+        }
+
+        private (string fistName, string lastName) SplitPersonData(string personName)
+        {
+            var nameLength = personName.Length;
+            var firstName = personName[..(nameLength / 2)];
+            var lastName = personName.Substring((nameLength / 2) + 1, (nameLength / 2) - 1);
+            return (firstName, lastName);
         }
     }
 }

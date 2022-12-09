@@ -38,7 +38,7 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Steps
             return options;
         }
 
-        protected EntityEventSns CreateEvent(Guid eventId, string eventType)
+        protected virtual EntityEventSns CreateEvent(Guid eventId, string eventType)
         {
             return _fixture.Build<EntityEventSns>()
                            .With(x => x.EntityId, eventId)
