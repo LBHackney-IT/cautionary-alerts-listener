@@ -7,9 +7,6 @@ namespace CautionaryAlertsListener.Tests
 {
     public static class CreateCautionaryAlertFixture
     {
-        public const string OldFirstName = "OldFirstName";
-        public const string OldLastName = "OldLastName";
-
         public static CreateCautionaryAlert GenerateValidCreateCautionaryAlertFixture(string defaultString, Fixture fixture, Guid? mmhId = null, string propertyReference = null)
         {
             var alert = fixture.Build<Alert>()
@@ -26,7 +23,7 @@ namespace CautionaryAlertsListener.Tests
 
             var personDetails = fixture.Build<PersonDetails>()
                 .With(x => x.Id, mmhId ?? Guid.NewGuid())
-                .With(x => x.Name, $"{OldFirstName} {OldLastName}")
+                .With(x => x.Name, $"{FixtureConstants.OldFirstName} {FixtureConstants.OldLastName}")
                 .Create();
 
             var cautionaryAlert = fixture.Build<CreateCautionaryAlert>()

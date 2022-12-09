@@ -64,13 +64,5 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Stories
                 .Then(t => _steps.ThenThePersonNameIsUpdated(_cautionaryAlertFixture.DbEntity, _dbFixture))
                 .BDDfy();
         }
-
-        private (string fistName, string lastName) SplitPersonData(string personName)
-        {
-            var nameLength = personName.Length;
-            var firstName = personName[..(nameLength / 2)];
-            var lastName = personName.Substring((nameLength / 2) + 1, (nameLength / 2) - 1);
-            return (firstName, lastName);
-        }
     }
 }
