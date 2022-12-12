@@ -77,7 +77,7 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
 
         public void GivenTheTenureDoesNotExist(Guid id)
         {
-            CreateMessageEventDataForPersonAdded();
+            // Nothing to do here
         }
 
         public void GivenAPersonWasRemoved(Guid id)

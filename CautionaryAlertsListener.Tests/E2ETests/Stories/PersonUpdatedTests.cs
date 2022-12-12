@@ -16,15 +16,16 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Stories
     {
         private readonly CautionaryAlertContext _dbFixture;
         private readonly CautionaryAlertFixture _cautionaryAlertFixture;
-        private readonly PersonUpdatedSteps _steps;
+        private readonly PersonUpdatedUseCaseSteps _steps;
         private bool _disposed;
         private MockApplicationFactory _appFactory;
+
         public PersonUpdatedTests(MockApplicationFactory appFactory)
         {
             _appFactory = appFactory;
             _dbFixture = _appFactory.CautionaryAlertContext;
             _cautionaryAlertFixture = new CautionaryAlertFixture(_dbFixture);
-            _steps = new PersonUpdatedSteps();
+            _steps = new PersonUpdatedUseCaseSteps();
         }
 
         public void Dispose()
@@ -37,6 +38,7 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Stories
         {
             if (disposing && !_disposed)
             {
+                _cautionaryAlertFixture.Dispose();
                 _dbFixture.Dispose();
                 _disposed = true;
             }

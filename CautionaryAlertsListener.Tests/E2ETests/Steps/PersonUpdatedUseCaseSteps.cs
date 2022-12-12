@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 
 namespace CautionaryAlertsListener.Tests.E2ETests.Steps
 {
-    public class PersonUpdatedSteps : BaseSteps
+    public class PersonUpdatedUseCaseSteps : BaseSteps
     {
-        public PersonUpdatedSteps()
+        public PersonUpdatedUseCaseSteps()
         {
             _eventType = EventTypes.PersonUpdatedEvent;
         }
@@ -28,14 +28,6 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Steps
         {
             await TriggerFunction(message).ConfigureAwait(false);
         }
-
-        public void ThenNoExceptionIsThrown()
-        {
-            _lastException.Should().BeNull();
-        }
-
-        public void ThenNothingShouldBeDone()
-        { }
 
         protected override EntityEventSns CreateEvent(Guid eventId, string eventType)
         {

@@ -92,5 +92,13 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Steps
         {
             receivedCorrelationIds.Should().Contain(_correlationId.ToString());
         }
+
+        public void ThenNothingShouldBeDone()
+        { }
+
+        public void ThenNoExceptionIsThrown()
+        {
+            _lastException.Should().BeNull();
+        }
     }
 }

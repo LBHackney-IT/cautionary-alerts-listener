@@ -48,7 +48,7 @@ namespace CautionaryAlertsListener.Tests.Gateway
         public void GetTenureInfoByIdAsyncGetExceptionThrown()
         {
             var exMessage = "This is an exception";
-            _mockApiGateway.Setup(x => x.GetByIdAsync<TenureResponseObject>(Route, _id, _correlationId))
+            _mockApiGateway.Setup(x => x.GetByIdAsync<TenureInformation>(Route, _id, _correlationId))
                            .ThrowsAsync(new Exception(exMessage));
 
             var sut = new TenureApiGateway(_mockApiGateway.Object);
