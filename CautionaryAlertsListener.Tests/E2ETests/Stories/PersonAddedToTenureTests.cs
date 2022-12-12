@@ -65,9 +65,8 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Stories
         {
             var tenureId = Guid.NewGuid();
             this.Given(g => _tenureApiFixture.GivenTheTenureDoesNotExist(tenureId))
-                .And(h => _steps.GivenAMessageWithPersonAdded(_tenureApiFixture.ResponseObject))
                 .When(w => _steps.WhenTheFunctionIsTriggered(tenureId))
-                .Then(t => _steps.ThenNothingShouldBeDone())
+                .Then(t => _steps.ThenATenureNotFoundExceptionIsThrown(tenureId))
                 .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_tenureApiFixture.ReceivedCorrelationIds))
                 .BDDfy();
         }

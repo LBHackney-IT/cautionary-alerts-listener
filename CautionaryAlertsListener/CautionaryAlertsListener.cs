@@ -8,6 +8,7 @@ using CautionaryAlertsListener.Infrastructure;
 using CautionaryAlertsListener.UseCase;
 using CautionaryAlertsListener.UseCase.Interfaces;
 using Hackney.Core.DynamoDb;
+using Hackney.Core.Http;
 using Hackney.Core.Logging;
 using Hackney.Core.Sns;
 using Microsoft.EntityFrameworkCore;
@@ -46,6 +47,7 @@ namespace CautionaryAlertsListener
 
             ConfigureDbContext(services);
 
+            services.AddApiGateway();
             base.ConfigureServices(services);
         }
 
