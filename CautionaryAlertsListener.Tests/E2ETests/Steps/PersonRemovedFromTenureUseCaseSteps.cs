@@ -12,11 +12,25 @@ using Xunit;
 using CautionaryAlertsListener.Infrastructure;
 using Hackney.Shared.CautionaryAlerts.Infrastructure;
 using FluentAssertions;
+using Hackney.Shared.Tenure.Boundary.Response;
+using Hackney.Shared.Tenure.Domain;
+using System.Linq;
+using CautionaryAlertsListener.Infrastructure.Exceptions;
+using Force.DeepCloner;
+using Microsoft.EntityFrameworkCore;
 
 namespace CautionaryAlertsListener.Tests.E2ETests.Steps
 {
     public class PersonRemovedFromTenureUseCaseSteps : BaseSteps
     {
+        public SQSEvent.SQSMessage TheMessage { get; private set; }
+        public Guid NewPersonId { get; private set; }
+
+        public PersonRemovedFromTenureUseCaseSteps()
+        {
+            _eventType = EventTypes.PersonRemovedFromTenureEvent;
+        }
+
         private SQSEvent.SQSMessage CreateMessage(Guid personId, EventData eventData, string eventType = EventTypes.PersonRemovedFromTenureEvent)
         {
             var personSns = _fixture.Build<EntityEventSns>()
@@ -56,9 +70,19 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Steps
 
         }
 
+        public async Task WhenTheFunctionIsTriggered(Guid id)
+        {
+            await TriggerFunction(id).ConfigureAwait(false);
+        }
+
+        public async Task WhenTheFunctionIsTriggered(SQSEvent.SQSMessage message)
+        {
+            await TriggerFunction(message).ConfigureAwait(false);
+        }
+
         public async Task ThenTheAlertIsUpdatedWithNullValuesForTenure(PropertyAlertNew beforeChange, Guid personId, CautionaryAlertContext dbContext)
         {
-            var entityInDb = await dbContext.PropertyAlerts.FindAsync(beforeChange.Id);
+            var entityInDb = await dbContext.PropertyAlerts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == beforeChange.Id);
             entityInDb.Should().NotBeNull();
 
             entityInDb.Should().BeEquivalentTo(beforeChange,
@@ -69,6 +93,29 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Steps
             entityInDb.PropertyReference.Should().BeNull();
             entityInDb.Address.Should().BeNull();
             entityInDb.UPRN.Should().BeNull();
+        }
+
+        public void ThenATenureNotFoundExceptionIsThrown(Guid id)
+        {
+            _lastException.Should().NotBeNull();
+            _lastException.Should().BeOfType(typeof(EntityNotFoundException<TenureInformation>));
+            (_lastException as EntityNotFoundException<TenureInformation>).Id.Should().Be(id);
+        }
+
+        public void GivenAMessageWithPersonRemoved(TenureInformation tenure)
+        {
+            var eventSns = CreateEvent(tenure.Id, _eventType);
+            var newData = tenure.HouseholdMembers;
+            var oldData = newData.DeepClone();
+            newData = newData.Take(newData.Count() - 1).ToList();
+            eventSns.EventData = new EventData()
+            {
+                OldData = new Dictionary<string, object> { { "householdMembers", oldData } },
+                NewData = new Dictionary<string, object> { { "householdMembers", newData } }
+            };
+
+            TheMessage = CreateMessage(eventSns);
+            NewPersonId = newData.Last().Id;
         }
     }
 }
