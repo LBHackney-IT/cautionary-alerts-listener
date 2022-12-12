@@ -39,7 +39,6 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Stories
             if (disposing && !_disposed)
             {
                 _cautionaryAlertFixture.Dispose();
-                _dbFixture.Dispose();
                 _disposed = true;
             }
         }

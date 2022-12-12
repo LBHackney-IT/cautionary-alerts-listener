@@ -41,7 +41,6 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Stories
         {
             if (disposing && !_disposed)
             {
-                _dbFixture.Dispose();
                 _tenureApiFixture.Dispose();
                 _cautionaryAlertFixture.Dispose();
                 _disposed = true;
@@ -52,8 +51,12 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Stories
         public void PropertyAlertForPersonNotFound()
         {
             var mmhId = Guid.NewGuid();
+            var tenureId = Guid.NewGuid();
             this.Given(g => _cautionaryAlertFixture.GivenACautionaryAlertDoesNotExistForPerson(mmhId))
-                .When(w => _steps.WhenTheFunctionIsTriggered(mmhId, _tenureApiFixture.MessageEventData, EventTypes.PersonRemovedFromTenureEvent))
+                .And(g => _tenureApiFixture.GivenTheTenureExists(tenureId))
+                .And(g => _steps.GivenAMessageWithPersonRemoved(_tenureApiFixture.ResponseObject))
+                .When(w => _steps.WhenTheFunctionIsTriggered(_steps.TheMessage))
+                .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_tenureApiFixture.ReceivedCorrelationIds))
                 .Then(t => _steps.ThenNoExceptionIsThrown())
                 .Then(t => _steps.ThenNothingShouldBeDone())
             .BDDfy();
@@ -64,8 +67,9 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Stories
         {
             var tenureId = Guid.NewGuid();
             this.Given(g => _tenureApiFixture.GivenTheTenureDoesNotExist(tenureId))
+                .When(w => _steps.WhenTheFunctionIsTriggered(tenureId))
+                .Then(t => _steps.ThenATenureNotFoundExceptionIsThrown(tenureId))
                 .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_tenureApiFixture.ReceivedCorrelationIds))
-                .Then(t => _steps.ThenNothingShouldBeDone())
                 .BDDfy();
         }
 
@@ -75,8 +79,8 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Stories
             var tenureId = Guid.NewGuid();
             var removedPersonId = Guid.NewGuid();
             this.Given(g => _tenureApiFixture.GivenTheTenureExists(tenureId))
-                .And(h => _tenureApiFixture.GivenAPersonWasRemoved(tenureId))
-                .And(h => _cautionaryAlertFixture.GivenTheCautionaryAlertAlreadyExist(removedPersonId, null))
+                .And(h => _tenureApiFixture.GivenAPersonWasRemoved(removedPersonId))
+                .And(h => _cautionaryAlertFixture.GivenTheCautionaryAlertAlreadyExist(removedPersonId, _tenureApiFixture.ResponseObject.TenuredAsset.PropertyReference))
                 .When(w => _steps.WhenTheFunctionIsTriggered(removedPersonId, _tenureApiFixture.MessageEventData, EventTypes.PersonRemovedFromTenureEvent))
                 .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_tenureApiFixture.ReceivedCorrelationIds))
                 .Then(t => _steps.ThenTheAlertIsUpdatedWithNullValuesForTenure(_cautionaryAlertFixture.DbEntity, removedPersonId, _dbFixture))
