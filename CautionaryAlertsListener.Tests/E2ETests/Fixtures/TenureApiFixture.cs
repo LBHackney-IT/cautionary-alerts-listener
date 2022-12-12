@@ -2,6 +2,7 @@ using AutoFixture;
 using Force.DeepCloner;
 using Hackney.Core.Sns;
 using Hackney.Core.Testing.Shared.E2E;
+using Hackney.Shared.CautionaryAlerts.Infrastructure;
 using Hackney.Shared.Tenure.Domain;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
     {
         private readonly Fixture _fixture = new Fixture();
         private const string DateFormat = "yyyy-MM-ddTHH\\:mm\\:ss.fffffffZ";
-
+        private readonly string _defaultString;
         public EventData MessageEventData { get; private set; }
         public Guid AddedPersonId { get; private set; }
         public Guid RemovedPersonId { get; private set; }
@@ -23,6 +24,7 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
         {
             Environment.SetEnvironmentVariable("TenureApiUrl", FixtureConstants.TenureApiRoute);
             Environment.SetEnvironmentVariable("TenureApiToken", FixtureConstants.TenureApiToken);
+            _defaultString = string.Join("", _fixture.CreateMany<char>(CreateCautionaryAlertConstants.INCIDENTDESCRIPTIONLENGTH));
         }
 
         protected override void Dispose(bool disposing)
@@ -91,11 +93,20 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
         }
         public TenureInformation GivenTheTenureExists(Guid id, Guid? personId)
         {
+            var cautionaryFixture = CreateCautionaryAlertFixture.GenerateValidCreateCautionaryAlertFixture(_defaultString, _fixture);
+            var tenureAsset = new TenuredAsset()
+            {
+                PropertyReference = cautionaryFixture.AssetDetails.PropertyReference,
+                Uprn = cautionaryFixture.AssetDetails.UPRN,
+                FullAddress = cautionaryFixture.AssetDetails.FullAddress
+            };
+
             ResponseObject = _fixture.Build<TenureInformation>()
                                      .With(x => x.Id, id)
                                      .With(x => x.StartOfTenureDate, DateTime.UtcNow.AddMonths(-6))
                                      .With(x => x.EndOfTenureDate, DateTime.UtcNow.AddYears(6))
                                      .With(x => x.HouseholdMembers, CreateHouseholdMembers())
+                                     .With(x => x.TenuredAsset, tenureAsset)
                                      .Create();
 
             if (personId.HasValue)
