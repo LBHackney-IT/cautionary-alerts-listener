@@ -63,14 +63,14 @@ namespace CautionaryAlertsListener.Tests.UseCase
         }
 
         [Fact]
-        public void ProcessMessageAsyncTestNullMessageThrows()
+        public async Task ProcessMessageAsyncTestNullMessageThrows()
         {
             Func<Task> func = async () => await _sut.ProcessMessageAsync(null).ConfigureAwait(false);
-            func.Should().ThrowAsync<ArgumentNullException>();
+            await func.Should().ThrowAsync<ArgumentNullException>();
         }
 
         [Fact]
-        public void ProcessMessageAsyncPersonIdNotFoundDoesNotCallUpdateEntities()
+        public async Task ProcessMessageAsyncPersonIdNotFoundDoesNotCallUpdateEntities()
         {
             _message = SetMessageEventData(_message);
             var mmhId = _message.Id;
@@ -78,13 +78,13 @@ namespace CautionaryAlertsListener.Tests.UseCase
                 .ReturnsAsync(new List<PropertyAlertNew>());
 
             Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
-            func.Should().NotThrow();
+            await func.Should().NotThrowAsync();
             _mockGateway.Verify(x => x.UpdateEntityAsync(It.IsAny<PropertyAlertNew>()), Times.Never);
         }
 
         // Comment this out as the Expandoobject data is serialized in SQS message and not when the use case is tested
         [Fact]
-        public void ProcessMessageAsyncTestPersonFoundCallsUpdateEntity()
+        public async Task ProcessMessageAsyncTestPersonFoundCallsUpdateEntity()
         {
             var response = new List<PropertyAlertNew>()
                 {
@@ -98,7 +98,7 @@ namespace CautionaryAlertsListener.Tests.UseCase
 
             var verifyList = new List<PropertyAlertNew>() { It.IsAny<PropertyAlertNew>() };
             Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
-            func.Should().NotThrow();
+            await func.Should().NotThrowAsync();
             _mockGateway.Verify(x => x.UpdateEntitiesAsync(response), Times.Once);
         }
     }

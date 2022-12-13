@@ -117,7 +117,7 @@ namespace CautionaryAlertsListener.Tests.UseCase
         }
 
         [Fact]
-        public void ProcessMessageAsyncTestPersonIdNotFoundDoesNoting()
+        public async Task ProcessMessageAsyncTestPersonIdNotFoundDoesNoting()
         {
             SetMessageEventData(_tenure, _message);
 
@@ -127,7 +127,7 @@ namespace CautionaryAlertsListener.Tests.UseCase
                                        .ReturnsAsync(_tenure);
 
             Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
-            func.Should().NotThrow();
+            await func.Should().NotThrowAsync();
             _mockGateway.Verify(x => x.UpdateEntityAsync(It.IsAny<PropertyAlertNew>()), Times.Never);
         }
 

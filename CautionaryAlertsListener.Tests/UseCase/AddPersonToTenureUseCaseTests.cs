@@ -129,7 +129,7 @@ namespace CautionaryAlertsListener.Tests.UseCase
         }
 
         [Fact]
-        public void ProcessMessageAsyncTestPersonIdNotFoundDoesNotCallUpdateEntity()
+        public async Task ProcessMessageAsyncTestPersonIdNotFoundDoesNotCallUpdateEntity()
         {
             var personId = SetMessageEventData(_tenure, _message, true);
             _mockGateway.Setup(x => x.GetEntitiesByMMHAndPropertyReferenceAsync(It.IsAny<Guid>().ToString(), null))
@@ -138,12 +138,12 @@ namespace CautionaryAlertsListener.Tests.UseCase
             _mockTenureApi.Setup(x => x.GetTenureByIdAsync(_message.EntityId, _message.CorrelationId))
                                        .ReturnsAsync(_tenure);
             Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
-            func.Should().NotThrow();
+            await func.Should().NotThrowAsync();
             _mockGateway.Verify(x => x.UpdateEntityAsync(It.IsAny<PropertyAlertNew>()), Times.Never);
         }
 
         [Fact]
-        public void ProcessMessageAsyncTestPersonFoundCallsUpdateEntity()
+        public async Task ProcessMessageAsyncTestPersonFoundCallsUpdateEntity()
         {
             var personId = SetMessageEventData(_tenure, _message, true);
             _mockGateway.Setup(x => x.GetEntitiesByMMHAndPropertyReferenceAsync(It.IsAny<string>(), It.IsAny<string>()))
@@ -153,7 +153,7 @@ namespace CautionaryAlertsListener.Tests.UseCase
                                        .ReturnsAsync(_tenure);
 
             Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
-            func.Should().NotThrow();
+            await func.Should().NotThrowAsync();
             _mockGateway.Verify(x => x.UpdateEntityAsync(It.IsAny<PropertyAlertNew>()), Times.Once);
         }
     }
