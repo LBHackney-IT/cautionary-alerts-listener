@@ -1,6 +1,7 @@
 using Amazon.Lambda.SQSEvents;
 using AutoFixture;
 using CautionaryAlertsListener.Infrastructure;
+using CautionaryAlertsListener.Tests.E2ETests.Fixtures;
 using FluentAssertions;
 using Hackney.Core.Sns;
 using Hackney.Shared.CautionaryAlerts.Infrastructure;

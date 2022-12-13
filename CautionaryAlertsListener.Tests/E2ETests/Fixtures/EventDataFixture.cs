@@ -1,7 +1,7 @@
 using Hackney.Core.Sns;
 using System.Dynamic;
 
-namespace CautionaryAlertsListener.Tests
+namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
 {
     public static class EventDataFixture
     {

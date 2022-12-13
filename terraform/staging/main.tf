@@ -55,7 +55,7 @@ resource "aws_sqs_queue" "cautionary_alerts_dead_letter_queue" {
 }
 
 resource "aws_sqs_queue" "cautionary_alerts_listener_queue" {
-  name                              = "housingsearchqueue.fifo"
+  name                              = "cautionaryalertsqueue.fifo"
   fifo_queue                        = true
   content_based_deduplication       = true
   kms_master_key_id                 = "alias/housing-staging-cmk"
@@ -122,7 +122,7 @@ resource "aws_ssm_parameter" "cautionary_alerts_listener_sqs_queue_arn" {
   value = aws_sqs_queue.cautionary_alerts_listener_queue.arn
 }
 
-module "housing_search_listener_cw_dashboard" {
+module "cautionary_alerts_listener_cw_dashboard" {
   source                     = "github.com/LBHackney-IT/aws-hackney-common-terraform.git//modules/cloudwatch/dashboards/listener-dashboard"
   environment_name           = var.environment_name
   listener_name              = "cautionary-alerts-listener"

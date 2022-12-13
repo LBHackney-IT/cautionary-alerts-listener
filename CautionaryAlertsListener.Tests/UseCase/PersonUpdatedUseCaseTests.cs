@@ -82,7 +82,6 @@ namespace CautionaryAlertsListener.Tests.UseCase
             _mockGateway.Verify(x => x.UpdateEntityAsync(It.IsAny<PropertyAlertNew>()), Times.Never);
         }
 
-        // Comment this out as the Expandoobject data is serialized in SQS message and not when the use case is tested
         [Fact]
         public async Task ProcessMessageAsyncTestPersonFoundCallsUpdateEntity()
         {
