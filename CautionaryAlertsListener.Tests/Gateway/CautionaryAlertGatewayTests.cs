@@ -61,7 +61,6 @@ namespace CautionaryAlertsListener.Tests.Gateway
             var response = await _classUnderTest.GetEntitiesByMMHAndPropertyReferenceAsync(dbEntity.MMHID, dbEntity.PropertyReference);
             response.Should().NotBeEmpty();
             response.Should().BeEquivalentTo(new List<PropertyAlertNew> { dbEntity });
-            
         }
 
         [Test]
