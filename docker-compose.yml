@@ -28,6 +28,7 @@ services:
       dockerfile: CautionaryAlertsListener.Tests/Dockerfile
       args:
         - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
+        - SONAR_TOKEN=${SONAR_TOKEN}
     environment:
       - DB_HOST=test-database
       - DB_PORT=5432
