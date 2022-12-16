@@ -22,9 +22,9 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Stories
         private MockApplicationFactory _appFactory;
         private readonly TenureApiFixture _tenureApiFixture;
 
-        public RemovePersonFromTenureTests(MockApplicationFactory appFactory)
+        public RemovePersonFromTenureTests()
         {
-            _appFactory = appFactory;
+            _appFactory = new MockApplicationFactory();
             _dbFixture = _appFactory.CautionaryAlertContext;
             _cautionaryAlertFixture = new CautionaryAlertFixture(_dbFixture);
             _steps = new PersonRemovedFromTenureUseCaseSteps();

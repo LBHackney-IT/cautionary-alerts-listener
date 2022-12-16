@@ -20,9 +20,9 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Stories
         private bool _disposed;
         private MockApplicationFactory _appFactory;
 
-        public PersonUpdatedTests(MockApplicationFactory appFactory)
+        public PersonUpdatedTests()
         {
-            _appFactory = appFactory;
+            _appFactory = new MockApplicationFactory();
             _dbFixture = _appFactory.CautionaryAlertContext;
             _cautionaryAlertFixture = new CautionaryAlertFixture(_dbFixture);
             _steps = new PersonUpdatedUseCaseSteps();

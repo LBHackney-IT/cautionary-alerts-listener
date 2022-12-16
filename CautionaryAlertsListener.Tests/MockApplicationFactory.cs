@@ -10,13 +10,12 @@ namespace CautionaryAlertsListener.Tests
 {
     public class MockApplicationFactory
     {
-        private const string ConnectionString = "Host=localhost;Port=5432;Database=testdb;Username=postgres;Password=mypassword";
         public CautionaryAlertContext CautionaryAlertContext { get; private set; }
 
         public MockApplicationFactory()
         {
             var dbBuilder = new DbContextOptionsBuilder();
-            dbBuilder.UseNpgsql(ConnectionString);
+            dbBuilder.UseNpgsql(ConnectionString.TestDatabase());
             CautionaryAlertContext = new CautionaryAlertContext(dbBuilder.Options);
             CreateHostBuilder(CautionaryAlertContext).Build();
         }
