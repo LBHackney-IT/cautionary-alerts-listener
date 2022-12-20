@@ -33,5 +33,5 @@ COPY . .
 RUN dotnet build -c Release -o out CautionaryAlertsListener/CautionaryAlertsListener.csproj
 RUN dotnet build -c debug -o out CautionaryAlertsListener.Tests/CautionaryAlertsListener.Tests.csproj
 
-# CMD dotnet test
+CMD dotnet test
 # RUN dotnet sonarscanner end /d:sonar.login="${SONAR_TOKEN}"
