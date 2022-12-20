@@ -20,8 +20,8 @@ functions:
     role: lambdaExecutionRole
     environment:
       CONNECTION_STRING: Host=${ssm:/uh-api/${self:provider.stage}/postgres-hostname};Port=${ssm:/uh-api/${self:provider.stage}/postgres-port};Database=uh_mirror;Username=${ssm:/uh-api/${self:provider.stage}/postgres-username};Password=${ssm:/uh-api/${self:provider.stage}/postgres-password}
-      TenureApiUrl: ${ssm:/tl-housing/${self:provider.stage}/tenure-api-url}
-      TenureApiToken: ${ssm:/tl-housing/${self:provider.stage}/tenure-api-token}
+      TenureApiUrl: ${ssm:/housing-tl/${self:provider.stage}/tenure-api-url}
+      TenureApiToken: ${ssm:/housing-tl/${self:provider.stage}/tenure-api-token}
     events:
       - sqs: ${ssm:/sqs-queue/${self:provider.stage}/cautionary_alerts_listener_queue/arn} 
 resources:
