@@ -2,7 +2,6 @@ using AutoFixture;
 using Bogus;
 using CautionaryAlertsListener.Gateway;
 using FluentAssertions;
-using FluentValidation;
 using Hackney.Core.Testing.Shared;
 using Hackney.Shared.CautionaryAlerts.Factories;
 using Hackney.Shared.CautionaryAlerts.Infrastructure;
@@ -11,7 +10,6 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace CautionaryAlertsListener.Tests.Gateway
@@ -38,35 +36,35 @@ namespace CautionaryAlertsListener.Tests.Gateway
         }
 
         [Test]
-        public async Task GetEntitiesByMMHAndPropertyReferenceAsyncReturnsNullIfNoneFound()
+        public async Task GetEntitiesByMMHIdAndPropertyReferenceAsyncReturnsNullIfNoneFound()
         {
-            var response = await _classUnderTest.GetEntitiesByMMHAndPropertyReferenceAsync(_fixture.Create<Guid>().ToString());
+            var response = await _classUnderTest.GetEntitiesByMMHIdAndPropertyReferenceAsync(_fixture.Create<Guid>().ToString());
             response.Should().BeEmpty();
         }
 
         [Test]
-        public async Task GetEntitiesByMMHAndPropertyReferenceAsyncReturnsCollectionIfFoundOnMMHID()
+        public async Task GetEntitiesByMMHIdAndPropertyReferenceAsyncReturnsCollectionIfFoundOnMMHID()
         {
             var dbEntity = await AddAlertToDb();
-            var response = await _classUnderTest.GetEntitiesByMMHAndPropertyReferenceAsync(dbEntity.MMHID);
+            var response = await _classUnderTest.GetEntitiesByMMHIdAndPropertyReferenceAsync(dbEntity.MMHID);
             response.Should().NotBeNull();
             response.Should().NotBeEmpty();
             response.Should().BeEquivalentTo(new List<PropertyAlertNew> { dbEntity });
         }
 
         [Test]
-        public async Task GetEntitiesByMMHAndPropertyReferenceAsyncReturnsCollectionIfFoundOnMMHIDAndPropertyReference()
+        public async Task GetEntitiesByMMHIdAndPropertyReferenceAsyncReturnsCollectionIfFoundOnMMHIDAndPropertyReference()
         {
             var dbEntity = await AddAlertToDb();
-            var response = await _classUnderTest.GetEntitiesByMMHAndPropertyReferenceAsync(dbEntity.MMHID, dbEntity.PropertyReference);
+            var response = await _classUnderTest.GetEntitiesByMMHIdAndPropertyReferenceAsync(dbEntity.MMHID, dbEntity.PropertyReference);
             response.Should().NotBeEmpty();
             response.Should().BeEquivalentTo(new List<PropertyAlertNew> { dbEntity });
         }
 
         [Test]
-        public async Task GetEntitiesByMMHAndPropertyReferenceAsyncThrowsOnMissingMMHID()
+        public async Task GetEntitiesByMMHIdAndPropertyReferenceAsyncThrowsOnMissingMMHID()
         {
-            Func<Task> func = async () => await _classUnderTest.GetEntitiesByMMHAndPropertyReferenceAsync(null).ConfigureAwait(false);
+            Func<Task> func = async () => await _classUnderTest.GetEntitiesByMMHIdAndPropertyReferenceAsync(null).ConfigureAwait(false);
             await func.Should().ThrowAsync<ArgumentNullException>();
         }
 
@@ -78,7 +76,7 @@ namespace CautionaryAlertsListener.Tests.Gateway
             dbEntity.PersonName = updatedPersonName;
             await CautionaryAlertContext.SaveChangesAsync();
 
-            var responseCollection = await _classUnderTest.GetEntitiesByMMHAndPropertyReferenceAsync(dbEntity.MMHID);
+            var responseCollection = await _classUnderTest.GetEntitiesByMMHIdAndPropertyReferenceAsync(dbEntity.MMHID);
             responseCollection.Should().NotBeEmpty();
             foreach (var item in responseCollection)
             {

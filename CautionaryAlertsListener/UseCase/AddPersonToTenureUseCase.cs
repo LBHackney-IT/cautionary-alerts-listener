@@ -4,8 +4,10 @@ using CautionaryAlertsListener.Infrastructure.Exceptions;
 using CautionaryAlertsListener.UseCase.Interfaces;
 using Hackney.Core.Logging;
 using Hackney.Core.Sns;
+using Hackney.Shared.CautionaryAlerts.Infrastructure;
 using Hackney.Shared.Tenure.Domain;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -27,22 +29,35 @@ namespace CautionaryAlertsListener.UseCase
         {
             if (message is null) throw new ArgumentNullException(nameof(message));
 
+            var householdMember = GetAddedOrUpdatedHouseholdMember(message.EventData);
+            if (householdMember is null) throw new HouseholdMembersNotChangedException(message.EntityId, message.CorrelationId);
+
+            var cautionaryAlerts = (await _gateway.GetEntitiesByMMHIdAndPropertyReferenceAsync(householdMember.Id.ToString()).ConfigureAwait(false));
+            if (cautionaryAlerts is null) return;
+
             var tenure = await _tenureApiGateway.GetTenureByIdAsync(message.EntityId, message.CorrelationId)
                                                 .ConfigureAwait(false);
             if (tenure is null) throw new EntityNotFoundException<TenureInformation>(message.EntityId);
 
-            var householdMember = GetAddedOrUpdatedHouseholdMember(message.EventData);
-            if (householdMember is null) throw new HouseholdMembersNotChangedException(message.EntityId, message.CorrelationId);
-
-            var entity = (await _gateway.GetEntitiesByMMHAndPropertyReferenceAsync(householdMember.Id.ToString(), tenure.TenuredAsset.PropertyReference).ConfigureAwait(false))?.FirstOrDefault();
-
-            if (entity is null) return;
-
-            entity.Address = tenure.TenuredAsset.FullAddress;
-            entity.PropertyReference = tenure.TenuredAsset.PropertyReference;
-            entity.UPRN = tenure.TenuredAsset.Uprn;
-
-            await _gateway.UpdateEntityAsync(entity).ConfigureAwait(false);
+            var newAlerts = new List<PropertyAlertNew>();
+            foreach (var alert in cautionaryAlerts)
+            {
+                var newAlert = new PropertyAlertNew
+                {
+                    Address = tenure.TenuredAsset.FullAddress,
+                    UPRN = tenure.TenuredAsset.Uprn,
+                    PropertyReference = tenure.TenuredAsset.PropertyReference,
+                    AssureReference = alert.AssureReference,
+                    MMHID = alert.MMHID,
+                    PersonName = alert.PersonName,
+                    Code = alert.Code,
+                    CautionOnSystem = alert.CautionOnSystem,
+                    DateOfIncident = alert.DateOfIncident,
+                    Reason = alert.Reason
+                }; // copy cautionary alert to new property
+                newAlerts.Add(newAlert);
+            }
+            await _gateway.SaveEntitiesAsync(newAlerts).ConfigureAwait(false);
         }
 
         private static HouseholdMembers GetAddedOrUpdatedHouseholdMember(EventData eventData)

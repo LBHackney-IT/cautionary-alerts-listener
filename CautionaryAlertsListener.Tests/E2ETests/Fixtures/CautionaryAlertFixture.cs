@@ -2,10 +2,8 @@ using AutoFixture;
 using CautionaryAlertsListener.Infrastructure;
 using Hackney.Shared.CautionaryAlerts.Factories;
 using Hackney.Shared.CautionaryAlerts.Infrastructure;
-using Hackney.Shared.Tenure.Boundary.Response;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
 {

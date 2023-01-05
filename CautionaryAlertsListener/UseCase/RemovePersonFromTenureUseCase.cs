@@ -31,15 +31,19 @@ namespace CautionaryAlertsListener.UseCase
             if (tenure is null) throw new EntityNotFoundException<TenureInformation>(message.EntityId);
 
             var householdMember = GetRemovedHouseholdMember(message.EventData);
-            var entity = (await _gateway.GetEntitiesByMMHAndPropertyReferenceAsync(householdMember.Id.ToString(), tenure.TenuredAsset.PropertyReference))?.FirstOrDefault();
+            if (householdMember is null) throw new HouseholdMembersNotChangedException(message.EntityId, message.CorrelationId);
 
-            if (entity is null) return;
+            var alerts = await _gateway.GetEntitiesByMMHIdAndPropertyReferenceAsync(householdMember.Id.ToString(), tenure.TenuredAsset.PropertyReference);
+            if (alerts is null) return;
 
-            entity.Address = null;
-            entity.PropertyReference = null;
-            entity.UPRN = null;
+            foreach (var item in alerts)
+            {
+                item.Address = null;
+                item.PropertyReference = null;
+                item.UPRN = null;
+            }
 
-            await _gateway.UpdateEntityAsync(entity).ConfigureAwait(false);
+            await _gateway.UpdateEntitiesAsync(alerts).ConfigureAwait(false);
         }
 
         private static HouseholdMembers GetRemovedHouseholdMember(EventData eventData)

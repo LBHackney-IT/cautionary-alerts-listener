@@ -1,6 +1,5 @@
 using AutoFixture;
 using Hackney.Core.Http;
-using Hackney.Shared.Tenure.Boundary.Response;
 using Moq;
 using System.Threading.Tasks;
 using System;
