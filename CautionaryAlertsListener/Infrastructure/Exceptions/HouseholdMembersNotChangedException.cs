@@ -14,5 +14,9 @@ namespace CautionaryAlertsListener.Infrastructure.Exceptions
             TenureId = tenureId;
             CorrelationId = correlationId;
         }
+
+        public HouseholdMembersNotChangedException() : base("There are no new or changed household member records on the tenure.")
+        {
+        }
     }
 }

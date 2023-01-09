@@ -24,6 +24,7 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Steps
     {
         public SQSEvent.SQSMessage TheMessage { get; private set; }
         public Guid NewPersonId { get; private set; }
+        public Guid TenureId { get; private set; }
 
         public PersonAddedToTenureUseCaseSteps()
         {
@@ -41,6 +42,12 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Steps
                 NewData = new Dictionary<string, object> { { "householdMembers", newData } }
             };
             TheMessage = CreateMessage(eventSns);
+            TenureId = tenure.Id;
+        }
+
+        public void GivenAMessageWithNoPersonAdded()
+        {
+            GivenAMessageWithNoPersonAdded(_fixture.Create<TenureInformation>());
         }
 
         public void GivenAMessageWithPersonAdded(TenureInformation tenure)
@@ -55,6 +62,12 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Steps
             };
             TheMessage = CreateMessage(eventSns);
             NewPersonId = newData.Last().Id;
+            TenureId = tenure.Id;
+        }
+
+        public void GivenAMessageWithPersonAdded()
+        {
+            GivenAMessageWithPersonAdded(_fixture.Create<TenureInformation>());
         }
 
         public async Task WhenTheFunctionIsTriggered(Guid id)
@@ -81,19 +94,22 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Steps
             (_lastException as HouseholdMembersNotChangedException).TenureId.Should().Be(tenureId);
         }
 
-        public async Task ThenTheAlertIsUpdated(PropertyAlertNew beforeChange, TenureInformation tenure, CautionaryAlertContext dbContext)
+        public async Task ThenANewAlertIsAdded(PropertyAlertNew oldAlert, TenureInformation tenure, CautionaryAlertContext dbContext)
         {
-            var entityInDb = await dbContext.PropertyAlerts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == beforeChange.Id);
+            var newAlert = await dbContext.PropertyAlerts.AsNoTracking()
+                                                         .Where(x => x.MMHID == oldAlert.MMHID && x.Id != oldAlert.Id)
+                                                         .FirstAsync();
 
-            entityInDb.Should().NotBeNull();
-            entityInDb.Should().BeEquivalentTo(beforeChange,
-                config => config.Excluding(x => x.PropertyReference)
+            newAlert.Should().NotBeNull();
+            newAlert.Should().BeEquivalentTo(oldAlert,
+                config => config.Excluding(x => x.Id)
+                                .Excluding(x => x.PropertyReference)
                                 .Excluding(x => x.Address)
                                 .Excluding(x => x.UPRN));
 
-            entityInDb.PropertyReference.Should().Be(tenure.TenuredAsset.PropertyReference);
-            entityInDb.Address.Should().Be(tenure.TenuredAsset.FullAddress);
-            entityInDb.UPRN.Should().Be(tenure.TenuredAsset.Uprn);
+            newAlert.PropertyReference.Should().Be(tenure.TenuredAsset.PropertyReference);
+            newAlert.Address.Should().Be(tenure.TenuredAsset.FullAddress);
+            newAlert.UPRN.Should().Be(tenure.TenuredAsset.Uprn);
         }
 
         private SQSEvent.SQSMessage CreateMessage(Guid personId, EventData eventData, string eventType = EventTypes.PersonRemovedFromTenureEvent)

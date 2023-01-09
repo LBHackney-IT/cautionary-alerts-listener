@@ -29,11 +29,11 @@ namespace CautionaryAlertsListener.UseCase
         {
             if (message is null) throw new ArgumentNullException(nameof(message));
 
-            var householdMember = GetAddedOrUpdatedHouseholdMember(message.EventData);
+            var householdMember = GetAddedOrUpdatedHouseholdMember(message);
             if (householdMember is null) throw new HouseholdMembersNotChangedException(message.EntityId, message.CorrelationId);
 
             var cautionaryAlerts = (await _gateway.GetEntitiesByMMHIdAndPropertyReferenceAsync(householdMember.Id.ToString()).ConfigureAwait(false));
-            if (cautionaryAlerts is null) return;
+            if (cautionaryAlerts is null || !cautionaryAlerts.Any()) return;
 
             var tenure = await _tenureApiGateway.GetTenureByIdAsync(message.EntityId, message.CorrelationId)
                                                 .ConfigureAwait(false);
@@ -60,12 +60,18 @@ namespace CautionaryAlertsListener.UseCase
             await _gateway.SaveEntitiesAsync(newAlerts).ConfigureAwait(false);
         }
 
-        private static HouseholdMembers GetAddedOrUpdatedHouseholdMember(EventData eventData)
+        private static HouseholdMembers GetAddedOrUpdatedHouseholdMember(EntityEventSns message)
         {
-            var oldHms = Helpers.GetHouseholdMembersFromEventData(eventData.OldData);
-            var newHms = Helpers.GetHouseholdMembersFromEventData(eventData.NewData);
-
-            return newHms.Except(oldHms).FirstOrDefault();
+            try
+            {
+                var oldHms = Helpers.GetHouseholdMembersFromEventData(message.EventData.OldData);
+                var newHms = Helpers.GetHouseholdMembersFromEventData(message.EventData.NewData);
+                return newHms.Except(oldHms).FirstOrDefault();
+            }
+            catch (HouseholdMembersNotChangedException)
+            {
+                throw new HouseholdMembersNotChangedException(message.EntityId, message.CorrelationId);
+            }
         }
     }
 }

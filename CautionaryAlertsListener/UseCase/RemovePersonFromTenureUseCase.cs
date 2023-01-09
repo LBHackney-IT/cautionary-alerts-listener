@@ -34,7 +34,7 @@ namespace CautionaryAlertsListener.UseCase
             if (householdMember is null) throw new HouseholdMembersNotChangedException(message.EntityId, message.CorrelationId);
 
             var alerts = await _gateway.GetEntitiesByMMHIdAndPropertyReferenceAsync(householdMember.Id.ToString(), tenure.TenuredAsset.PropertyReference);
-            if (alerts is null) return;
+            if (alerts is null || !alerts.Any()) return;
 
             foreach (var item in alerts)
             {
