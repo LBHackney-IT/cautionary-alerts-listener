@@ -53,7 +53,7 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
 
         public void GivenTheCautionaryAlertAlreadyExist(Guid mmhId, string propertyReference = null)
         {
-            if (null == DbEntity)
+            if (DbEntity == null)
             {
                 var entity = ConstructAndSaveCautionaryAlertMMHIDOptionalPropertyReference(mmhId, propertyReference);
                 DbEntity = entity;

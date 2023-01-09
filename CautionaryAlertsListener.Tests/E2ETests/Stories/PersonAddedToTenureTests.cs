@@ -87,7 +87,7 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Stories
             var tenureId = Guid.NewGuid();
             this.Given(g => _tenureApiFixture.GivenTheTenureExists(tenureId))
                 .And(h => _steps.GivenAMessageWithPersonAdded(_tenureApiFixture.ResponseObject))
-                .And(h => _cautionaryAlertFixture.GivenTheCautionaryAlertAlreadyExist(_steps.NewPersonId, _tenureApiFixture.ResponseObject.TenuredAsset.PropertyReference))
+                .And(h => _cautionaryAlertFixture.GivenTheCautionaryAlertAlreadyExist(_steps.NewPersonId, null))
                 .When(w => _steps.WhenTheFunctionIsTriggered(_steps.TheMessage))
                 .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_tenureApiFixture.ReceivedCorrelationIds))
                 .Then(t => _steps.ThenTheAlertIsUpdated(_cautionaryAlertFixture.DbEntity, _tenureApiFixture.ResponseObject,

@@ -121,7 +121,7 @@ namespace CautionaryAlertsListener.Tests.UseCase
             await func.Should().NotThrowAsync();
             _mockGateway.Verify(x => x.SaveEntitiesAsync(It.IsAny<IEnumerable<PropertyAlertNew>>()), Times.Never);
         }
-        
+
         [Fact]
         public async Task ProcessMessageAsyncTestGetTenureExceptionThrown()
         {
