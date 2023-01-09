@@ -12,7 +12,6 @@ using Xunit;
 using CautionaryAlertsListener.Infrastructure;
 using Hackney.Shared.CautionaryAlerts.Infrastructure;
 using FluentAssertions;
-using Hackney.Shared.Tenure.Boundary.Response;
 using Hackney.Shared.Tenure.Domain;
 using System.Linq;
 using CautionaryAlertsListener.Infrastructure.Exceptions;

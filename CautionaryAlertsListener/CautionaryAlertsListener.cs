@@ -1,13 +1,11 @@
 using Amazon.Lambda.Core;
 using Amazon.Lambda.SQSEvents;
-using CautionaryAlertsListener.Boundary;
 using CautionaryAlertsListener.Factories;
 using CautionaryAlertsListener.Gateway;
 using CautionaryAlertsListener.Gateway.Interfaces;
 using CautionaryAlertsListener.Infrastructure;
 using CautionaryAlertsListener.UseCase;
 using CautionaryAlertsListener.UseCase.Interfaces;
-using Hackney.Core.DynamoDb;
 using Hackney.Core.Http;
 using Hackney.Core.Logging;
 using Hackney.Core.Sns;

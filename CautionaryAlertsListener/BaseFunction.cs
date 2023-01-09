@@ -1,5 +1,3 @@
-using Amazon.XRay.Recorder.Core;
-using Amazon.XRay.Recorder.Core.Strategies;
 using Amazon.XRay.Recorder.Handlers.AwsSdk;
 using CautionaryAlertsListener.Infrastructure;
 using Hackney.Core.Logging;

@@ -2,10 +2,8 @@ using AutoFixture;
 using CautionaryAlertsListener.Infrastructure;
 using Hackney.Shared.CautionaryAlerts.Factories;
 using Hackney.Shared.CautionaryAlerts.Infrastructure;
-using Hackney.Shared.Tenure.Boundary.Response;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
 {
@@ -55,7 +53,7 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
 
         public void GivenTheCautionaryAlertAlreadyExist(Guid mmhId, string propertyReference = null)
         {
-            if (null == DbEntity)
+            if (DbEntity == null)
             {
                 var entity = ConstructAndSaveCautionaryAlertMMHIDOptionalPropertyReference(mmhId, propertyReference);
                 DbEntity = entity;
