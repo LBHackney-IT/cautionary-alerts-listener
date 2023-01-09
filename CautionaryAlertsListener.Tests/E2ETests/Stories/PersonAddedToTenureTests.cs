@@ -47,6 +47,41 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Stories
         }
 
         [Fact]
+        public void PropertyAlertForNoPersonAddedShouldThrow()
+        {
+            this.Given(g => _steps.GivenAMessageWithNoPersonAdded(_tenureApiFixture.ResponseObject))
+                .When(w => _steps.WhenTheFunctionIsTriggered(_steps.TheMessage))
+                .Then(t => _steps.ThenAHouseholdMembersNotChangedExceptionIsThrown(_tenureApiFixture.ResponseObject.Id))
+                .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_tenureApiFixture.ReceivedCorrelationIds))
+            .BDDfy();
+        }
+
+        [Fact]
+        public void PropertyAlertForPersonNotFound()
+        {
+            var tenureId = Guid.NewGuid();
+            this.Given(g => _tenureApiFixture.GivenTheTenureExists(tenureId))
+                .And(g => _steps.GivenAMessageWithPersonAdded(_tenureApiFixture.ResponseObject))
+                .When(w => _steps.WhenTheFunctionIsTriggered(_steps.TheMessage))
+                .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_tenureApiFixture.ReceivedCorrelationIds))
+                .Then(t => _steps.ThenNoExceptionIsThrown())
+                .Then(t => _steps.ThenNothingShouldBeDone())
+            .BDDfy();
+        }
+
+        [Fact]
+        public void TenureNotFoundShouldThrow()
+        {
+            var tenureId = Guid.NewGuid();
+            this.Given(g => _tenureApiFixture.GivenTheTenureDoesNotExist(tenureId))
+                .And(g => _steps.GivenAMessageWithPersonAdded(_tenureApiFixture.ResponseObject))
+                .When(w => _steps.WhenTheFunctionIsTriggered(tenureId))
+                .Then(t => _steps.ThenATenureNotFoundExceptionIsThrown(tenureId))
+                .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_tenureApiFixture.ReceivedCorrelationIds))
+                .BDDfy();
+        }
+
+        [Fact]
         public void ListenerUpdatesTheCautionaryAlert()
         {
             var tenureId = Guid.NewGuid();
@@ -58,46 +93,6 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Stories
                 .Then(t => _steps.ThenTheAlertIsUpdated(_cautionaryAlertFixture.DbEntity, _tenureApiFixture.ResponseObject,
                                                          _dbFixture))
                 .BDDfy();
-        }
-
-        [Fact]
-        public void TenureNotFound()
-        {
-            var tenureId = Guid.NewGuid();
-            this.Given(g => _tenureApiFixture.GivenTheTenureDoesNotExist(tenureId))
-                .When(w => _steps.WhenTheFunctionIsTriggered(tenureId))
-                .Then(t => _steps.ThenATenureNotFoundExceptionIsThrown(tenureId))
-                .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_tenureApiFixture.ReceivedCorrelationIds))
-                .BDDfy();
-        }
-
-        [Fact]
-        public void PropertyAlertForPersonNotFound()
-        {
-            var mmhId = Guid.NewGuid();
-            var tenureId = Guid.NewGuid();
-            this.Given(g => _cautionaryAlertFixture.GivenACautionaryAlertDoesNotExistForPerson(mmhId))
-                .And(g => _tenureApiFixture.GivenTheTenureExists(tenureId))
-                .And(g => _steps.GivenAMessageWithPersonAdded(_tenureApiFixture.ResponseObject))
-                .When(w => _steps.WhenTheFunctionIsTriggered(_steps.TheMessage))
-                .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_tenureApiFixture.ReceivedCorrelationIds))
-                .Then(t => _steps.ThenNoExceptionIsThrown())
-                .Then(t => _steps.ThenNothingShouldBeDone())
-            .BDDfy();
-        }
-
-        [Fact]
-        public void PropertyAlertForNoPersonAddedShouldThrow()
-        {
-            var mmhId = Guid.NewGuid();
-            var tenureId = Guid.NewGuid();
-            this.Given(g => _cautionaryAlertFixture.GivenACautionaryAlertDoesNotExistForPerson(mmhId))
-                .And(g => _tenureApiFixture.GivenTheTenureExists(tenureId))
-                .And(g => _steps.GivenAMessageWithNoPersonAdded(_tenureApiFixture.ResponseObject))
-                .When(w => _steps.WhenTheFunctionIsTriggered(_steps.TheMessage))
-                .Then(t => _steps.ThenAHouseholdMembersNotChangedExceptionIsThrown(tenureId))
-                .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_tenureApiFixture.ReceivedCorrelationIds))
-            .BDDfy();
         }
     }
 }

@@ -109,7 +109,19 @@ namespace CautionaryAlertsListener.Tests.UseCase
             func.Should().ThrowAsync<HouseholdMembersNotChangedException>();
         }
 
+        [Fact]
+        public async Task ProcessMessageAsyncTestPersonIdNotFoundDoesNotCallSaveEntitiesAsync()
+        {
+            _mockGateway.Setup(x => x.GetEntitiesByMMHIdAndPropertyReferenceAsync(It.IsAny<Guid>().ToString(), null))
+                .ReturnsAsync(new List<PropertyAlertNew>());
 
+            _mockTenureApi.Setup(x => x.GetTenureByIdAsync(_message.EntityId, _message.CorrelationId))
+                                       .ReturnsAsync(_tenure);
+            Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
+            await func.Should().NotThrowAsync();
+            _mockGateway.Verify(x => x.SaveEntitiesAsync(It.IsAny<IEnumerable<PropertyAlertNew>>()), Times.Never);
+        }
+        
         [Fact]
         public async Task ProcessMessageAsyncTestGetTenureExceptionThrown()
         {
@@ -134,19 +146,6 @@ namespace CautionaryAlertsListener.Tests.UseCase
 
             Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
             await func.Should().ThrowAsync<EntityNotFoundException<TenureInformation>>();
-        }
-
-        [Fact]
-        public async Task ProcessMessageAsyncTestPersonIdNotFoundDoesNotCallSaveEntitiesAsync()
-        {
-            _mockGateway.Setup(x => x.GetEntitiesByMMHIdAndPropertyReferenceAsync(It.IsAny<Guid>().ToString(), null))
-                .ReturnsAsync(new List<PropertyAlertNew>());
-
-            _mockTenureApi.Setup(x => x.GetTenureByIdAsync(_message.EntityId, _message.CorrelationId))
-                                       .ReturnsAsync(_tenure);
-            Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
-            await func.Should().NotThrowAsync();
-            _mockGateway.Verify(x => x.SaveEntitiesAsync(It.IsAny<IEnumerable<PropertyAlertNew>>()), Times.Never);
         }
 
         [Fact]
