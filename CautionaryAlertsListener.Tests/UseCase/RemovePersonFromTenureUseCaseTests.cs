@@ -11,7 +11,6 @@ using CautionaryAlertsListener.UseCase;
 using System.Linq;
 using Force.DeepCloner;
 using FluentAssertions;
-using CautionaryAlertsListener.Infrastructure;
 using Hackney.Shared.CautionaryAlerts.Infrastructure;
 using Hackney.Shared.Tenure.Domain;
 
@@ -117,11 +116,11 @@ namespace CautionaryAlertsListener.Tests.UseCase
         }
 
         [Fact]
-        public async Task ProcessMessageAsyncTestPersonIdNotFoundDoesNoting()
+        public async Task ProcessMessageAsyncTestPersonIdNotFoundDoesNothing()
         {
             SetMessageEventData(_tenure, _message);
 
-            _mockGateway.Setup(x => x.GetEntitiesByMMHAndPropertyReferenceAsync(It.IsAny<Guid>().ToString(), null))
+            _mockGateway.Setup(x => x.GetEntitiesByMMHIdAndPropertyReferenceAsync(It.IsAny<Guid>().ToString(), null))
                 .ReturnsAsync((List<PropertyAlertNew>) null);
             _mockTenureApi.Setup(x => x.GetTenureByIdAsync(_message.EntityId, _message.CorrelationId))
                                        .ReturnsAsync(_tenure);
@@ -137,17 +136,17 @@ namespace CautionaryAlertsListener.Tests.UseCase
             SetMessageEventData(_tenure, _message);
 
             _mockTenureApi.Setup(x => x.GetTenureByIdAsync(It.IsAny<Guid>(), _correlationId)).ReturnsAsync(_tenure);
-            _mockGateway.Setup(x => x.GetEntitiesByMMHAndPropertyReferenceAsync(It.IsAny<string>(), It.IsAny<string>()))
+            _mockGateway.Setup(x => x.GetEntitiesByMMHIdAndPropertyReferenceAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new List<PropertyAlertNew>() { _fixture.Create<PropertyAlertNew>() });
 
             var exMsg = "This is the last error";
-            _mockGateway.Setup(x => x.UpdateEntityAsync(It.IsAny<PropertyAlertNew>()))
+            _mockGateway.Setup(x => x.UpdateEntitiesAsync(It.IsAny<IEnumerable<PropertyAlertNew>>()))
                         .ThrowsAsync(new Exception(exMsg));
 
             Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
             func.Should().ThrowAsync<Exception>().WithMessage(exMsg);
 
-            _mockGateway.Verify(x => x.UpdateEntityAsync(It.IsAny<PropertyAlertNew>()), Times.Once);
+            _mockGateway.Verify(x => x.UpdateEntitiesAsync(It.IsAny<IEnumerable<PropertyAlertNew>>()), Times.Once);
         }
 
         [Fact]
@@ -156,11 +155,11 @@ namespace CautionaryAlertsListener.Tests.UseCase
             SetMessageEventData(_tenure, _message);
 
             _mockTenureApi.Setup(x => x.GetTenureByIdAsync(It.IsAny<Guid>(), _correlationId)).ReturnsAsync(_tenure);
-            _mockGateway.Setup(x => x.GetEntitiesByMMHAndPropertyReferenceAsync(It.IsAny<string>(), It.IsAny<string>()))
+            _mockGateway.Setup(x => x.GetEntitiesByMMHIdAndPropertyReferenceAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new List<PropertyAlertNew>() { _fixture.Create<PropertyAlertNew>() });
 
             await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
-            _mockGateway.Verify(x => x.UpdateEntityAsync(It.IsAny<PropertyAlertNew>()), Times.Once);
+            _mockGateway.Verify(x => x.UpdateEntitiesAsync(It.IsAny<IEnumerable<PropertyAlertNew>>()), Times.Once);
         }
     }
 }

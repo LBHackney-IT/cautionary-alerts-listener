@@ -6,7 +6,8 @@ namespace CautionaryAlertsListener.Gateway.Interfaces
 {
     public interface ICautionaryAlertGateway
     {
-        Task<ICollection<PropertyAlertNew>> GetEntitiesByMMHAndPropertyReferenceAsync(string mmhId, string tenureId = null);
+        Task<ICollection<PropertyAlertNew>> GetEntitiesByMMHIdAndPropertyReferenceAsync(string mmhId, string propertyReference = null);
+        Task SaveEntitiesAsync(IEnumerable<PropertyAlertNew> entities);
         Task UpdateEntityAsync(PropertyAlertNew entity);
         Task UpdateEntitiesAsync(IEnumerable<PropertyAlertNew> propertyAlerts);
     }

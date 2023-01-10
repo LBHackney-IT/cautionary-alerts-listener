@@ -24,6 +24,7 @@ namespace CautionaryAlertsListener.Tests.UseCase
         private readonly AddPersonToTenureUseCase _sut;
 
         private readonly EntityEventSns _message;
+        private Guid? _personId;
         private readonly TenureInformation _tenure;
 
         private readonly Fixture _fixture;
@@ -39,6 +40,7 @@ namespace CautionaryAlertsListener.Tests.UseCase
 
             _tenure = CreateTenure();
             _message = CreateMessage(_tenure.Id);
+            _personId = SetMessageEventData(_tenure, _message, true);
         }
 
         private TenureInformation CreateTenure()
@@ -97,27 +99,6 @@ namespace CautionaryAlertsListener.Tests.UseCase
         }
 
         [Fact]
-        public async Task ProcessMessageAsyncTestGetTenureExceptionThrown()
-        {
-            var exMsg = "This is an error";
-            _mockTenureApi.Setup(x => x.GetTenureByIdAsync(_message.EntityId, _message.CorrelationId))
-                                       .ThrowsAsync(new Exception(exMsg));
-
-            Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
-            (await func.Should().ThrowAsync<Exception>()).WithMessage(exMsg);
-        }
-
-        [Fact]
-        public async Task ProcessMessageAsyncTestGetTenureReturnsNullThrows()
-        {
-            _mockTenureApi.Setup(x => x.GetTenureByIdAsync(_message.EntityId, _message.CorrelationId))
-                                       .ReturnsAsync((TenureInformation) null);
-
-            Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
-            await func.Should().ThrowAsync<EntityNotFoundException<TenureInformation>>();
-        }
-
-        [Fact]
         public void ProcessMessageAsyncTestNoChangedHouseholdMembersThrows()
         {
             SetMessageEventData(_tenure, _message, false);
@@ -129,32 +110,57 @@ namespace CautionaryAlertsListener.Tests.UseCase
         }
 
         [Fact]
-        public async Task ProcessMessageAsyncTestPersonIdNotFoundDoesNotCallUpdateEntity()
+        public async Task ProcessMessageAsyncTestPersonIdNotFoundDoesNotCallSaveEntitiesAsync()
         {
-            var personId = SetMessageEventData(_tenure, _message, true);
-            _mockGateway.Setup(x => x.GetEntitiesByMMHAndPropertyReferenceAsync(It.IsAny<Guid>().ToString(), null))
+            _mockGateway.Setup(x => x.GetEntitiesByMMHIdAndPropertyReferenceAsync(It.IsAny<Guid>().ToString(), null))
                 .ReturnsAsync(new List<PropertyAlertNew>());
 
             _mockTenureApi.Setup(x => x.GetTenureByIdAsync(_message.EntityId, _message.CorrelationId))
                                        .ReturnsAsync(_tenure);
             Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
             await func.Should().NotThrowAsync();
-            _mockGateway.Verify(x => x.UpdateEntityAsync(It.IsAny<PropertyAlertNew>()), Times.Never);
+            _mockGateway.Verify(x => x.SaveEntitiesAsync(It.IsAny<IEnumerable<PropertyAlertNew>>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task ProcessMessageAsyncTestGetTenureExceptionThrown()
+        {
+            _mockGateway.Setup(x => x.GetEntitiesByMMHIdAndPropertyReferenceAsync(It.IsAny<string>(), null))
+                        .ReturnsAsync(_fixture.Create<List<PropertyAlertNew>>());
+
+            var exMsg = "This is an error";
+            _mockTenureApi.Setup(x => x.GetTenureByIdAsync(_message.EntityId, _message.CorrelationId))
+                                       .ThrowsAsync(new Exception(exMsg));
+
+            Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
+            (await func.Should().ThrowAsync<Exception>()).WithMessage(exMsg);
+        }
+
+        [Fact]
+        public async Task ProcessMessageAsyncTestGetTenureReturnsNullThrows()
+        {
+            _mockGateway.Setup(x => x.GetEntitiesByMMHIdAndPropertyReferenceAsync(It.IsAny<string>(), null))
+                        .ReturnsAsync(_fixture.Create<List<PropertyAlertNew>>());
+            _mockTenureApi.Setup(x => x.GetTenureByIdAsync(_message.EntityId, _message.CorrelationId))
+                                       .ReturnsAsync((TenureInformation) null);
+
+            Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
+            await func.Should().ThrowAsync<EntityNotFoundException<TenureInformation>>();
         }
 
         [Fact]
         public async Task ProcessMessageAsyncTestPersonFoundCallsUpdateEntity()
         {
-            var personId = SetMessageEventData(_tenure, _message, true);
-            _mockGateway.Setup(x => x.GetEntitiesByMMHAndPropertyReferenceAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new List<PropertyAlertNew>() { _fixture.Create<PropertyAlertNew>() });
+            var propertyAlerts = _fixture.CreateMany<PropertyAlertNew>().ToList();
+            _mockGateway.Setup(x => x.GetEntitiesByMMHIdAndPropertyReferenceAsync(It.IsAny<string>(), It.IsAny<string>()))
+                        .ReturnsAsync(propertyAlerts);
 
             _mockTenureApi.Setup(x => x.GetTenureByIdAsync(_message.EntityId, _message.CorrelationId))
-                                       .ReturnsAsync(_tenure);
+                          .ReturnsAsync(_tenure);
 
             Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
             await func.Should().NotThrowAsync();
-            _mockGateway.Verify(x => x.UpdateEntityAsync(It.IsAny<PropertyAlertNew>()), Times.Once);
+            _mockGateway.Verify(x => x.SaveEntitiesAsync(It.Is<IEnumerable<PropertyAlertNew>>(x => x.Count() == propertyAlerts.Count)), Times.Once);
         }
     }
 }

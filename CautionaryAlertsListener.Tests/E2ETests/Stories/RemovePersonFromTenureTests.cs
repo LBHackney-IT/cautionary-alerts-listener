@@ -53,7 +53,7 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Stories
             var mmhId = Guid.NewGuid();
             var tenureId = Guid.NewGuid();
             this.Given(g => _cautionaryAlertFixture.GivenACautionaryAlertDoesNotExistForPerson(mmhId))
-                .And(g => _tenureApiFixture.GivenTheTenureExists(tenureId))
+                .And(g => _tenureApiFixture.GivenTheTenureExists(tenureId, mmhId))
                 .And(g => _steps.GivenAMessageWithPersonRemoved(_tenureApiFixture.ResponseObject))
                 .When(w => _steps.WhenTheFunctionIsTriggered(_steps.TheMessage))
                 .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_tenureApiFixture.ReceivedCorrelationIds))

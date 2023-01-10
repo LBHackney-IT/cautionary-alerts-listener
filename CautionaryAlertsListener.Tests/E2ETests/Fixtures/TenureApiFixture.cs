@@ -93,7 +93,7 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
         }
         public TenureInformation GivenTheTenureExists(Guid id, Guid? personId)
         {
-            var cautionaryFixture = CreateCautionaryAlertFixture.GenerateValidCreateCautionaryAlertFixture(_defaultString, _fixture);
+            var cautionaryFixture = CreateCautionaryAlertFixture.GenerateValidCreateCautionaryAlertFixture(_defaultString, _fixture, personId);
             var tenureAsset = new TenuredAsset()
             {
                 PropertyReference = cautionaryFixture.AssetDetails.PropertyReference,
