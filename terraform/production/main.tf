@@ -39,7 +39,7 @@ locals {
 
 terraform {
   backend "s3" {
-    bucket  = "terraform-state-housing-production"
+    bucket  = "terraform-state-production-apis"
     encrypt = true
     region  = "eu-west-2"
     key     = "services/cautionary-alerts-listener/state"
