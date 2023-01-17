@@ -70,34 +70,34 @@ resource "aws_sqs_queue_policy" "cautionary_alerts_listener_queue_policy" {
   queue_url = aws_sqs_queue.cautionary_alerts_listener_queue.id
   policy    = <<POLICY
   {
-      "Version": "2012-10-17",
-      "Id": "sqspolicy",
-      "Statement": [
-        {
-            "Sid": "First",
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": "sqs:SendMessage",
-            "Resource": "${aws_sqs_queue.cautionary_alerts_listener_queue.arn}",
-            "Condition": {
-                "ArnEquals": {
-                    "aws:SourceArn": "${data.aws_ssm_parameter.person_sns_topic_arn.value}"
-                }
-            }
-        },
-        {
-            "Sid": "Second",
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": "sqs:SendMessage",
-            "Resource": "${aws_sqs_queue.cautionary_alerts_listener_queue.arn}",
-            "Condition": {
-                "ArnEquals": {
-                    "aws:SourceArn": "${data.aws_ssm_parameter.tenure_sns_topic_arn.value}"
-                }
-            }
-        }
-      ]
+    "Version": "2012-10-17",
+    "Id": "sqspolicy",
+    "Statement": [
+      {
+          "Sid": "First",
+          "Effect": "Allow",
+          "Principal": "*",
+          "Action": "sqs:SendMessage",
+          "Resource": "${aws_sqs_queue.cautionary_alerts_listener_queue.arn}",
+          "Condition": {
+              "ArnEquals": {
+                  "aws:SourceArn": "${data.aws_ssm_parameter.person_sns_topic_arn.value}"
+              }
+          }
+      },
+      {
+          "Sid": "Second",
+          "Effect": "Allow",
+          "Principal": "*",
+          "Action": "sqs:SendMessage",
+          "Resource": "${aws_sqs_queue.cautionary_alerts_listener_queue.arn}",
+          "Condition": {
+              "ArnEquals": {
+                  "aws:SourceArn": "${data.aws_ssm_parameter.tenure_sns_topic_arn.value}"
+              }
+          }
+      }
+    ]
   }
   POLICY
 }
