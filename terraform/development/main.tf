@@ -68,7 +68,7 @@ resource "aws_sqs_queue" "cautionary_alerts_listener_queue" {
 
 resource "aws_sqs_queue_policy" "cautionary_alerts_listener_queue_policy" {
   queue_url = aws_sqs_queue.cautionary_alerts_listener_queue.id
-  policy    = <<POLICY
+  policy    =
   {
     "Version": "2012-10-17",
     "Id": "sqspolicy",
@@ -99,7 +99,6 @@ resource "aws_sqs_queue_policy" "cautionary_alerts_listener_queue_policy" {
       }
     ]
   }
-  POLICY
 }
 
 resource "aws_sns_topic_subscription" "cautionary_alerts_listener_subscribe_to_person_sns" {
