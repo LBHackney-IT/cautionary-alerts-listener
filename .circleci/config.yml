@@ -239,7 +239,7 @@ workflows:
             - api-nuget-token-context
             - SonarCloud
       - assume-role-development:
-          context: api-assume-role-housing-development-context
+          context: api-assume-role-development-context
           requires:
             - build-and-test
       - terraform-init-and-plan-development:
@@ -276,7 +276,7 @@ workflows:
             branches:
               only: release
       - assume-role-staging:
-          context: api-assume-role-housing-staging-context
+          context: api-assume-role-staging-context
           requires:
               - build-and-test
           filters:
@@ -312,7 +312,7 @@ workflows:
           requires:
             - deploy-to-staging
       - assume-role-production:
-          context: api-assume-role-housing-production-context
+          context: api-assume-role-production-context
           requires:
               - permit-production-terraform-release
           filters:
