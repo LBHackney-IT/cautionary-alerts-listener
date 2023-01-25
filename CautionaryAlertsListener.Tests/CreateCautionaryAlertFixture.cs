@@ -22,7 +22,7 @@ namespace CautionaryAlertsListener.Tests
                 .Create();
 
             var personDetails = fixture.Build<PersonDetails>()
-                .With(x => x.Id, mmhId ?? Guid.NewGuid())
+                .With(x => x.Id, mmhId /*?? Guid.NewGuid()*/)
                 .With(x => x.Name, $"{FixtureConstants.OldFirstName} {FixtureConstants.OldLastName}")
                 .Create();
 
