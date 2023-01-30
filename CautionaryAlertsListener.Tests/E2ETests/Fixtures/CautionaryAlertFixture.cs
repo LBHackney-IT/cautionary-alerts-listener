@@ -2,6 +2,7 @@ using AutoFixture;
 using CautionaryAlertsListener.Infrastructure;
 using Hackney.Shared.CautionaryAlerts.Factories;
 using Hackney.Shared.CautionaryAlerts.Infrastructure;
+using Hackney.Shared.CautionaryAlerts;
 using System;
 using System.Collections.Generic;
 

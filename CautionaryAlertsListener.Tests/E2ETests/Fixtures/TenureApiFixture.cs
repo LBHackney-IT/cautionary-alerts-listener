@@ -4,6 +4,7 @@ using Hackney.Core.Sns;
 using Hackney.Core.Testing.Shared.E2E;
 using Hackney.Shared.CautionaryAlerts.Infrastructure;
 using Hackney.Shared.Tenure.Domain;
+using Hackney.Shared.CautionaryAlerts;
 using System;
 using System.Collections.Generic;
 using System.Linq;

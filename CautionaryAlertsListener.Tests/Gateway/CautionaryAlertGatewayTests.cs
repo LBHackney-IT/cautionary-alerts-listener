@@ -5,6 +5,7 @@ using FluentAssertions;
 using Hackney.Core.Testing.Shared;
 using Hackney.Shared.CautionaryAlerts.Factories;
 using Hackney.Shared.CautionaryAlerts.Infrastructure;
+using Hackney.Shared.CautionaryAlerts;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
