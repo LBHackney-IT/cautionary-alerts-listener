@@ -87,7 +87,7 @@ namespace CautionaryAlertsListener.Tests.Gateway
 
         private async Task<PropertyAlertNew> AddAlertToDb()
         {
-            var alert = CreateCautionaryAlertFixture.GenerateValidCreateCautionaryAlertFixture(_defaultString, _fixture);
+            var alert = GenerateValidCreateCautionaryAlertFixture(_defaultString, _fixture);
             var dbEntity = alert.ToDatabase();
             CautionaryAlertContext.PropertyAlerts.Add(dbEntity);
             await CautionaryAlertContext.SaveChangesAsync();

@@ -44,8 +44,7 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
 
         private PropertyAlertNew ConstructAndSaveCautionaryAlertMMHIDOptionalPropertyReference(Guid mmhId, string propertyReference = null)
         {
-            var cautionaryAlert = CreateCautionaryAlertFixture
-                .GenerateValidCreateCautionaryAlertFixture(_defaultString, _fixture, mmhId, propertyReference);
+            var cautionaryAlert = GenerateValidCreateCautionaryAlertFixture(_defaultString, _fixture, mmhId, propertyReference);
             var dbEntity = cautionaryAlert.ToDatabase();
             _dbContext.PropertyAlerts.Add(dbEntity);
             _dbContext.SaveChanges();
