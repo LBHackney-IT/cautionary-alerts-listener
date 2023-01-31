@@ -4,10 +4,11 @@ using Hackney.Core.Sns;
 using Hackney.Core.Testing.Shared.E2E;
 using Hackney.Shared.CautionaryAlerts.Infrastructure;
 using Hackney.Shared.Tenure.Domain;
-using Hackney.Shared.CautionaryAlerts.Tests;
+using Hackney.Shared.CautionaryAlerts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static CautionaryAlertsListener.Tests.CreateCautionaryAlertsFixture;
 
 namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
 {
@@ -94,7 +95,8 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
         }
         public TenureInformation GivenTheTenureExists(Guid id, Guid? personId)
         {
-            var cautionaryFixture = GenerateValidCreateCautionaryAlertFixture(_defaultString, _fixture, personId);
+            var addressString = string.Join("", _fixture.CreateMany<char>(CreateCautionaryAlertConstants.FULLADDRESSLENGTH));
+            var cautionaryFixture = CreateCautionaryAlertFixture.GenerateValidCreateCautionaryAlertFixture(_defaultString, _fixture, addressString, personId);
             var tenureAsset = new TenuredAsset()
             {
                 PropertyReference = cautionaryFixture.AssetDetails.PropertyReference,

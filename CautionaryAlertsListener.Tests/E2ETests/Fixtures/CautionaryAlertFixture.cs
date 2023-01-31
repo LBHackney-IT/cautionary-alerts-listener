@@ -2,9 +2,10 @@ using AutoFixture;
 using CautionaryAlertsListener.Infrastructure;
 using Hackney.Shared.CautionaryAlerts.Factories;
 using Hackney.Shared.CautionaryAlerts.Infrastructure;
-using Hackney.Shared.CautionaryAlerts.Tests;
+using Hackney.Shared.CautionaryAlerts;
 using System;
 using System.Collections.Generic;
+using static CautionaryAlertsListener.Tests.CreateCautionaryAlertsFixture;
 
 namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
 {
@@ -44,7 +45,8 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
 
         private PropertyAlertNew ConstructAndSaveCautionaryAlertMMHIDOptionalPropertyReference(Guid mmhId, string propertyReference = null)
         {
-            var cautionaryAlert = GenerateValidCreateCautionaryAlertFixture(_defaultString, _fixture, mmhId, propertyReference);
+            var addressString = string.Join("", _fixture.CreateMany<char>(CreateCautionaryAlertConstants.FULLADDRESSLENGTH));
+            var cautionaryAlert = CreateCautionaryAlertFixture.GenerateValidCreateCautionaryAlertFixture(_defaultString, _fixture,addressString, mmhId, propertyReference);
             var dbEntity = cautionaryAlert.ToDatabase();
             _dbContext.PropertyAlerts.Add(dbEntity);
             _dbContext.SaveChanges();

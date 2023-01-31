@@ -5,13 +5,13 @@ using FluentAssertions;
 using Hackney.Core.Testing.Shared;
 using Hackney.Shared.CautionaryAlerts.Factories;
 using Hackney.Shared.CautionaryAlerts.Infrastructure;
-using Hackney.Shared.CautionaryAlertsz.Tests;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static CautionaryAlertsListener.Tests.CreateCautionaryAlertsFixture;
 
 namespace CautionaryAlertsListener.Tests.Gateway
 {
@@ -87,7 +87,8 @@ namespace CautionaryAlertsListener.Tests.Gateway
 
         private async Task<PropertyAlertNew> AddAlertToDb()
         {
-            var alert = GenerateValidCreateCautionaryAlertFixture(_defaultString, _fixture);
+            var addressString = string.Join("", _fixture.CreateMany<char>(CreateCautionaryAlertConstants.FULLADDRESSLENGTH));
+            var alert = CreateCautionaryAlertFixture.GenerateValidCreateCautionaryAlertFixture(_defaultString, _fixture, addressString);
             var dbEntity = alert.ToDatabase();
             CautionaryAlertContext.PropertyAlerts.Add(dbEntity);
             await CautionaryAlertContext.SaveChangesAsync();
