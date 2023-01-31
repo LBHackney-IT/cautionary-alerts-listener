@@ -36,7 +36,7 @@ namespace CautionaryAlertsListener.Tests
                     .With(x => x.PersonDetails, personDetails)
                     .With(x => x.AssetDetails, assetDetails)
                     .With(x => x.IncidentDescription, defaultString[..CreateCautionaryAlertConstants.INCIDENTDESCRIPTIONLENGTH])
-                    //.With(x => x.IncidentDate, fixture.Create<DateTime>().AddDays(-1))
+                    .With(x => x.IncidentDate, fixture.Create<DateTime>().AddDays(-1))
                     .With(x => x.AssureReference, defaultString[..CreateCautionaryAlertConstants.ASSUREREFERENCELENGTH])
                     .Create();
 
