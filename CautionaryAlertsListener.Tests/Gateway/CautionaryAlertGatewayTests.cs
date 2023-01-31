@@ -11,6 +11,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static CautionaryAlertsListener.Tests.CreateCautionaryAlertsFixture;
 
 namespace CautionaryAlertsListener.Tests.Gateway
 {
@@ -86,7 +87,8 @@ namespace CautionaryAlertsListener.Tests.Gateway
 
         private async Task<PropertyAlertNew> AddAlertToDb()
         {
-            var alert = CreateCautionaryAlertFixture.GenerateValidCreateCautionaryAlertFixture(_defaultString, _fixture);
+            var addressString = string.Join("", _fixture.CreateMany<char>(CreateCautionaryAlertConstants.FULLADDRESSLENGTH));
+            var alert = CreateCautionaryAlertFixture.GenerateValidCreateCautionaryAlertFixture(_defaultString, _fixture, addressString);
             var dbEntity = alert.ToDatabase();
             CautionaryAlertContext.PropertyAlerts.Add(dbEntity);
             await CautionaryAlertContext.SaveChangesAsync();
