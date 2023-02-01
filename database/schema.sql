@@ -623,10 +623,10 @@ create table dbo."CCAddress"(
 );
 
 
-CREATE TABLE dbo."PropertyAlertNew"(
+create table dbo."PropertyAlertNew"(
 	"id" SERIAL PRIMARY KEY NOT NULL,
 	"door_number" varchar(10),
-	"address" varchar(50),
+	"address" varchar(255),
 	"neighbourhood" varchar(20),
 	"date_of_incident" varchar(12),
 	"code" varchar(5),
