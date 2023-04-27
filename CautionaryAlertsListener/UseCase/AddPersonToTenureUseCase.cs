@@ -39,25 +39,12 @@ namespace CautionaryAlertsListener.UseCase
                                                 .ConfigureAwait(false);
             if (tenure is null) throw new EntityNotFoundException<TenureInformation>(message.EntityId);
 
-            var newAlerts = new List<PropertyAlertNew>();
-            foreach (var alert in cautionaryAlerts)
-            {
-                var newAlert = new PropertyAlertNew
-                {
-                    Address = tenure.TenuredAsset.FullAddress,
-                    UPRN = tenure.TenuredAsset.Uprn,
-                    PropertyReference = tenure.TenuredAsset.PropertyReference,
-                    AssureReference = alert.AssureReference,
-                    MMHID = alert.MMHID,
-                    PersonName = alert.PersonName,
-                    Code = alert.Code,
-                    CautionOnSystem = alert.CautionOnSystem,
-                    DateOfIncident = alert.DateOfIncident,
-                    Reason = alert.Reason
-                }; // copy cautionary alert to new property
-                newAlerts.Add(newAlert);
-            }
-            await _gateway.SaveEntitiesAsync(newAlerts).ConfigureAwait(false);
+            var alert = cautionaryAlerts.FirstOrDefault();
+            alert.PropertyReference = tenure.TenuredAsset.PropertyReference;
+            alert.UPRN = tenure.TenuredAsset.Uprn;
+            alert.Address = tenure.TenuredAsset.FullAddress;
+
+            await _gateway.UpdateEntityAsync(alert).ConfigureAwait(false);
         }
 
         private static HouseholdMembers GetAddedOrUpdatedHouseholdMember(EntityEventSns message)
