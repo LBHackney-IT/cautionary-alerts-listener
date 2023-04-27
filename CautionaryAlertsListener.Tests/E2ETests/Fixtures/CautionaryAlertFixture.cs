@@ -23,7 +23,7 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
         public CautionaryAlertFixture(CautionaryAlertContext dbContext)
         {
             _dbContext = dbContext;
-            _defaultString = string.Join("", _fixture.CreateMany<char>(CreateCautionaryAlertConstants.INCIDENTDESCRIPTIONLENGTH));
+            _defaultString = string.Join("", _fixture.CreateMany<char>(CautionaryAlertConstants.INCIDENTDESCRIPTIONLENGTH));
         }
 
         public void Dispose()
@@ -45,9 +45,9 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
 
         private PropertyAlertNew ConstructAndSaveCautionaryAlertMMHIDOptionalPropertyReference(Guid mmhId, string propertyReference = null)
         {
-            var addressString = string.Join("", _fixture.CreateMany<char>(CreateCautionaryAlertConstants.FULLADDRESSLENGTH));
+            var addressString = string.Join("", _fixture.CreateMany<char>(CautionaryAlertConstants.FULLADDRESSLENGTH));
             var cautionaryAlert = CreateCautionaryAlertFixture.GenerateValidCreateCautionaryAlertFixture(_defaultString, _fixture, addressString, mmhId, propertyReference);
-            var dbEntity = cautionaryAlert.ToDatabase();
+            var dbEntity = cautionaryAlert.ToDatabase(isActive: true, Guid.NewGuid().ToString());
             _dbContext.PropertyAlerts.Add(dbEntity);
             _dbContext.SaveChanges();
             return dbEntity;
