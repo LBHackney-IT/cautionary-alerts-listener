@@ -46,9 +46,9 @@ namespace CautionaryAlertsListener.Tests.UseCase
         private TenureInformation CreateTenure()
         {
             return _fixture.Build<TenureInformation>()
-                           .With(x => x.Id, It.IsAny<Guid>())
+                           .With(x => x.Id, Guid.NewGuid())
                            .With(x => x.HouseholdMembers, _fixture.Build<HouseholdMembers>()
-                                                                  .With(x => x.Id, It.IsAny<Guid>())
+                                                                  .With(x => x.Id, Guid.NewGuid())
                                                                   .CreateMany(3)
                                                                   .ToList())
                            .Create();
@@ -149,10 +149,11 @@ namespace CautionaryAlertsListener.Tests.UseCase
         }
 
         [Fact]
-        public async Task ProcessMessageAsyncTestPersonFoundCallsUpdateEntity()
+        public async Task ProcessMessageAsyncTestPersonFoundCallUpdateAlert()
         {
-            var propertyAlerts = _fixture.CreateMany<PropertyAlertNew>().ToList();
-            _mockGateway.Setup(x => x.GetEntitiesByMMHIdAndPropertyReferenceAsync(It.IsAny<string>(), It.IsAny<string>()))
+            var propertyAlerts = _fixture.Build<PropertyAlertNew>().CreateMany(1).ToList();
+
+            _mockGateway.Setup(x => x.GetEntitiesByMMHIdAndPropertyReferenceAsync(It.IsAny<string>(), null))
                         .ReturnsAsync(propertyAlerts);
 
             _mockTenureApi.Setup(x => x.GetTenureByIdAsync(_message.EntityId, _message.CorrelationId))
@@ -160,7 +161,7 @@ namespace CautionaryAlertsListener.Tests.UseCase
 
             Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
             await func.Should().NotThrowAsync();
-            _mockGateway.Verify(x => x.SaveEntitiesAsync(It.Is<IEnumerable<PropertyAlertNew>>(x => x.Count() == propertyAlerts.Count)), Times.Once);
+            _mockGateway.Verify(x => x.UpdateEntityAsync(It.IsAny<PropertyAlertNew>()), Times.Once);
         }
     }
 }

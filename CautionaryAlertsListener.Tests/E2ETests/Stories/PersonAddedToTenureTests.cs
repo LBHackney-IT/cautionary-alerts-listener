@@ -87,7 +87,7 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Stories
                 .And(h => _cautionaryAlertFixture.GivenTheCautionaryAlertAlreadyExist(_steps.NewPersonId, null))
                 .When(w => _steps.WhenTheFunctionIsTriggered(_steps.TheMessage))
                 .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_tenureApiFixture.ReceivedCorrelationIds))
-                .Then(t => _steps.ThenANewAlertIsAdded(_cautionaryAlertFixture.DbEntity, _tenureApiFixture.ResponseObject,
+                .Then(t => _steps.ThenAlertIsUpdated(_cautionaryAlertFixture.DbEntity, _tenureApiFixture.ResponseObject,
                                                        _dbFixture))
                 .BDDfy();
         }
