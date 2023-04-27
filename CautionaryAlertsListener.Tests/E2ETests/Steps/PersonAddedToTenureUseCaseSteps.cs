@@ -94,22 +94,21 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Steps
             (_lastException as HouseholdMembersNotChangedException).TenureId.Should().Be(tenureId);
         }
 
-        public async Task ThenANewAlertIsAdded(PropertyAlertNew oldAlert, TenureInformation tenure, CautionaryAlertContext dbContext)
+        public async Task ThenAlertIsUpdated(PropertyAlertNew alert, TenureInformation tenure, CautionaryAlertContext dbContext)
         {
-            var newAlert = await dbContext.PropertyAlerts.AsNoTracking()
-                                                         .Where(x => x.MMHID == oldAlert.MMHID && x.Id != oldAlert.Id)
+            var updatedAlert = await dbContext.PropertyAlerts.AsNoTracking()
+                                                         .Where(x => x.MMHID == alert.MMHID && x.Id == alert.Id)
                                                          .FirstAsync();
 
-            newAlert.Should().NotBeNull();
-            newAlert.Should().BeEquivalentTo(oldAlert,
-                config => config.Excluding(x => x.Id)
-                                .Excluding(x => x.PropertyReference)
+            updatedAlert.Should().NotBeNull();
+            updatedAlert.Should().BeEquivalentTo(alert,
+                config => config.Excluding(x => x.PropertyReference)
                                 .Excluding(x => x.Address)
                                 .Excluding(x => x.UPRN));
 
-            newAlert.PropertyReference.Should().Be(tenure.TenuredAsset.PropertyReference);
-            newAlert.Address.Should().Be(tenure.TenuredAsset.FullAddress);
-            newAlert.UPRN.Should().Be(tenure.TenuredAsset.Uprn);
+            updatedAlert.PropertyReference.Should().Be(tenure.TenuredAsset.PropertyReference);
+            updatedAlert.Address.Should().Be(tenure.TenuredAsset.FullAddress);
+            updatedAlert.UPRN.Should().Be(tenure.TenuredAsset.Uprn);
         }
 
         private SQSEvent.SQSMessage CreateMessage(Guid personId, EventData eventData, string eventType = EventTypes.PersonRemovedFromTenureEvent)

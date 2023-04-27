@@ -33,7 +33,7 @@ namespace CautionaryAlertsListener.Tests.Gateway
             _mockedLogger = new Mock<ILogger<CautionaryAlertGateway>>();
             _classUnderTest = new CautionaryAlertGateway(CautionaryAlertContext, _mockedLogger.Object);
             _fixture = new Fixture();
-            _defaultString = string.Join("", _fixture.CreateMany<char>(CreateCautionaryAlertConstants.INCIDENTDESCRIPTIONLENGTH));
+            _defaultString = string.Join("", _fixture.CreateMany<char>(CautionaryAlertConstants.INCIDENTDESCRIPTIONLENGTH));
         }
 
         [Test]
@@ -87,9 +87,9 @@ namespace CautionaryAlertsListener.Tests.Gateway
 
         private async Task<PropertyAlertNew> AddAlertToDb()
         {
-            var addressString = string.Join("", _fixture.CreateMany<char>(CreateCautionaryAlertConstants.FULLADDRESSLENGTH));
+            var addressString = string.Join("", _fixture.CreateMany<char>(CautionaryAlertConstants.FULLADDRESSLENGTH));
             var alert = CreateCautionaryAlertFixture.GenerateValidCreateCautionaryAlertFixture(_defaultString, _fixture, addressString);
-            var dbEntity = alert.ToDatabase();
+            var dbEntity = alert.ToDatabase(isActive: true, Guid.NewGuid().ToString());
             CautionaryAlertContext.PropertyAlerts.Add(dbEntity);
             await CautionaryAlertContext.SaveChangesAsync();
             return dbEntity;

@@ -26,7 +26,7 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
         {
             Environment.SetEnvironmentVariable("TenureApiUrl", FixtureConstants.TenureApiRoute);
             Environment.SetEnvironmentVariable("TenureApiToken", FixtureConstants.TenureApiToken);
-            _defaultString = string.Join("", _fixture.CreateMany<char>(CreateCautionaryAlertConstants.INCIDENTDESCRIPTIONLENGTH));
+            _defaultString = string.Join("", _fixture.CreateMany<char>(CautionaryAlertConstants.INCIDENTDESCRIPTIONLENGTH));
         }
 
         protected override void Dispose(bool disposing)
@@ -95,7 +95,7 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Fixtures
         }
         public TenureInformation GivenTheTenureExists(Guid id, Guid? personId)
         {
-            var addressString = string.Join("", _fixture.CreateMany<char>(CreateCautionaryAlertConstants.FULLADDRESSLENGTH));
+            var addressString = string.Join("", _fixture.CreateMany<char>(CautionaryAlertConstants.FULLADDRESSLENGTH));
             var cautionaryFixture = CreateCautionaryAlertFixture.GenerateValidCreateCautionaryAlertFixture(_defaultString, _fixture, addressString, personId);
             var tenureAsset = new TenuredAsset()
             {
