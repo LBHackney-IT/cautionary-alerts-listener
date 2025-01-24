@@ -1,3 +1,4 @@
+using System;
 using CautionaryAlertsListener.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +14,19 @@ namespace CautionaryAlertsListener.Tests
 
         public MockApplicationFactory()
         {
+            var connectionString = ConnectionString.TestDatabase();
+            EnsureEnvVarConfigured("CONNECTION_STRING", connectionString);
+
             var dbBuilder = new DbContextOptionsBuilder();
-            dbBuilder.UseNpgsql(ConnectionString.TestDatabase());
+            dbBuilder.UseNpgsql(connectionString);
             CautionaryAlertContext = new CautionaryAlertContext(dbBuilder.Options);
             CreateHostBuilder(CautionaryAlertContext).Build();
+        }
+
+        private static void EnsureEnvVarConfigured(string name, string defaultValue)
+        {
+            if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable(name)))
+                Environment.SetEnvironmentVariable(name, defaultValue);
         }
 
         public IHostBuilder CreateHostBuilder(CautionaryAlertContext context) => Host.CreateDefaultBuilder(null)
