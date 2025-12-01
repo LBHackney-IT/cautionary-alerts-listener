@@ -129,248 +129,76 @@ commands:
             sls deploy --stage <<parameters.stage>> --conceal
 
 jobs:
-  check-code-formatting:
-    executor: docker-dotnet
-    steps:
-      - checkout
-      - run:
-          name: Install dotnet format
-          command: dotnet tool install dotnet-format --tool-path ./dotnet-format-local/
-      - run:
-          name: Run formatter check
-          command: ./dotnet-format-local/dotnet-format --check
-  build-and-test:
-    executor: docker-python
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run:
-          name: build
-          command: docker compose build cautionary-alerts-listener-test
-      - run:
-          name: Run tests
-          command: docker compose run cautionary-alerts-listener-test
-  assume-role-development:
+  assume-role-disaster-recovery:
     executor: docker-python
     steps:
       - assume-role-and-persist-workspace:
-          aws-account: $AWS_ACCOUNT_DEVELOPMENT
-  assume-role-staging:
-    executor: docker-python
-    steps:
-      - assume-role-and-persist-workspace:
-          aws-account: $AWS_ACCOUNT_STAGING
-  assume-role-production:
-    executor: docker-python
-    steps:
-      - assume-role-and-persist-workspace:
-          aws-account: $AWS_ACCOUNT_PRODUCTION
-  terraform-init-and-plan-development:
-    executor: docker-terraform
-    steps:
-      - terraform-init-then-plan:
-          environment: "development"
-  terraform-compliance-development:
-    executor: docker-terraform
-    steps:
-      - terraform-compliance:
-          environment: "development"
-  terraform-apply-development:
-    executor: docker-terraform
-    steps:
-      - terraform-apply:
-          environment: "development"
-  terraform-init-and-plan-staging:
-    executor: docker-terraform
-    steps:
-      - terraform-init-then-plan:
-          environment: "staging"
-  terraform-compliance-staging:
-    executor: docker-terraform
-    steps:
-      - terraform-compliance:
-          environment: "staging"
-  terraform-apply-staging:
-    executor: docker-terraform
-    steps:
-      - terraform-apply:
-          environment: "staging"
-  terraform-init-and-plan-production:
+          aws-account: $AWS_ACCOUNT_DISASTER_RECOVERY
+  terraform-init-and-plan-disaster-recovery:
     executor: docker-terraform
     steps:
       - terraform-init-then-plan:
           environment: "production"
-  terraform-compliance-production:
+  terraform-compliance-disaster-recovery:
     executor: docker-terraform
     steps:
       - terraform-compliance:
           environment: "production"
-  terraform-apply-production:
+  terraform-apply-disaster-recovery:
     executor: docker-terraform
     steps:
       - terraform-apply:
           environment: "production"
-  deploy-to-development:
-    executor: docker-dotnet
-    steps:
-      - deploy-lambda:
-          stage: "development"
-  deploy-to-staging:
-    executor: docker-dotnet
-    steps:
-      - deploy-lambda:
-          stage: "staging"
-  deploy-to-production:
+  deploy-to-disaster-recovery:
     executor: docker-dotnet
     steps:
       - deploy-lambda:
           stage: "production"
 
 workflows:
-  check:
-    jobs:
-      - check-code-formatting:
-          context: api-nuget-token-context
-          filters:
-            branches:
-              ignore:
-                - master
-                - release
-      - build-and-test:
-          context: 
-            - api-nuget-token-context
-            - SonarCloud
-          filters:
-            branches:
-              ignore:
-                - master
-                - release
-
-  check-and-deploy-development:
-    jobs:
-      - check-code-formatting:
-          context: api-nuget-token-context
-          filters:
-            branches:
-              only: master
-      - build-and-test:
-          context: 
-            - api-nuget-token-context
-            - SonarCloud
-          filters:
-            branches:
-              only: master
-      - assume-role-development:
-          context: api-assume-role-development-context
-          requires:
-            - build-and-test
-      - terraform-init-and-plan-development:
-          requires:
-            - assume-role-development
-      - terraform-compliance-development:
-          requires:
-            - terraform-init-and-plan-development
-      - terraform-apply-development:
-          requires:
-            - terraform-compliance-development
-      - deploy-to-development:
-          context:
-            - api-nuget-token-context
-            - "Serverless Framework"
-          requires:
-            - terraform-apply-development
-
   check-and-deploy-staging-and-production:
       jobs:
-      - check-code-formatting:
-          context: api-nuget-token-context
-          filters:
-            branches:
-              only: release
-      - build-and-test:
-          context: 
-            - api-nuget-token-context
-            - SonarCloud
-          filters:
-            branches:
-              only: release
-      - assume-role-staging:
-          context: api-assume-role-staging-context
-          requires:
-              - build-and-test
-          filters:
-             branches:
-               only: release
-      - terraform-init-and-plan-staging:
-          requires:
-            - assume-role-staging
-          filters:
-            branches:
-              only: release
-      - terraform-compliance-staging:
-          requires:
-            - terraform-init-and-plan-staging
-          filters:
-            branches:
-              only: release
-      - terraform-apply-staging:
-          requires:
-            - terraform-compliance-staging
-          filters:
-            branches:
-              only: release
-      - deploy-to-staging:
-          context:
-            - api-nuget-token-context
-            - "Serverless Framework"
-          requires:
-            - terraform-apply-staging
-          filters:
-            branches:
-              only: release
       - permit-production-terraform-release:
           type: approval
-          requires:
-            - deploy-to-staging
-      - assume-role-production:
-          context: api-assume-role-production-context
+      - assume-role-disaster-recovery:
+          context: api-assume-role-disaster-recovery-context
           requires:
               - permit-production-terraform-release
           filters:
              branches:
-               only: release
-      - terraform-init-and-plan-production:
+               only: disaster-recovery-test
+      - terraform-init-and-plan-disaster-recovery:
           requires:
-            - assume-role-production
+            - assume-role-disaster-recovery
           filters:
             branches:
-              only: release
-      - terraform-compliance-production:
+              only: disaster-recovery-test
+      - terraform-compliance-disaster-recovery:
           requires:
-            - terraform-init-and-plan-production
+            - terraform-init-and-plan-disaster-recovery
           filters:
             branches:
-              only: release
-      - terraform-apply-production:
+              only: disaster-recovery-test
+      - terraform-apply-disaster-recovery:
           requires:
-            - terraform-compliance-production
+            - terraform-compliance-disaster-recovery
           filters:
             branches:
-              only: release
-      - permit-production-release:
+              only: disaster-recovery-test
+      - permit-disaster-recovery-release:
           type: approval
           requires:
             - deploy-to-staging
-            - terraform-apply-production
+            - terraform-apply-disaster-recovery
           filters:
             branches:
-              only: release
-      - deploy-to-production:
+              only: disaster-recovery-test
+      - deploy-to-disaster-recovery:
           context:
             - api-nuget-token-context
             - "Serverless Framework"
           requires:
-            - permit-production-release
+            - permit-disaster-recovery-release
           filters:
             branches:
-              only: release
+              only: disaster-recovery-test
