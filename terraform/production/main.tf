@@ -81,7 +81,7 @@ resource "aws_sqs_queue_policy" "cautionary_alerts_listener_queue_policy" {
             "Resource": "${aws_sqs_queue.cautionary_alerts_listener_queue.arn}",
             "Condition": {
                 "ArnEquals": {
-                    "aws:SourceArn": "${data.aws_ssm_parameter.person_sns_topic_arn.value}"
+                    "aws:SourceArn": "arn:aws:sns:eu-west-2:851725205572:person.fifo"
                 }
             }
         },
@@ -93,7 +93,7 @@ resource "aws_sqs_queue_policy" "cautionary_alerts_listener_queue_policy" {
             "Resource": "${aws_sqs_queue.cautionary_alerts_listener_queue.arn}",
             "Condition": {
                 "ArnEquals": {
-                    "aws:SourceArn": "${data.aws_ssm_parameter.tenure_sns_topic_arn.value}"
+                    "aws:SourceArn": "$arn:aws:sns:eu-west-2:851725205572:person.fifo" 
                 }
             }
         }
@@ -101,6 +101,7 @@ resource "aws_sqs_queue_policy" "cautionary_alerts_listener_queue_policy" {
   }
   POLICY
 }
+# ^ We put the person fifo twice as a workaround. Should replace it with the proper tenure fifo at some point maybe in a certain timeframe.
 
 resource "aws_sns_topic_subscription" "cautionary_alerts_listener_subscribe_to_person_sns" {
   topic_arn            = data.aws_ssm_parameter.person_sns_topic_arn.value
