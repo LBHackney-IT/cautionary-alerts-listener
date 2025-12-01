@@ -188,7 +188,6 @@ workflows:
       - permit-disaster-recovery-release:
           type: approval
           requires:
-            - deploy-to-staging
             - terraform-apply-disaster-recovery
           filters:
             branches:
