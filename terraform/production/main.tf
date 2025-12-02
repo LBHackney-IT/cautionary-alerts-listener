@@ -58,8 +58,6 @@ resource "aws_sqs_queue" "cautionary_alerts_listener_queue" {
   name                              = "cautionaryalertsqueue.fifo"
   fifo_queue                        = true
   content_based_deduplication       = true
-  kms_master_key_id                 = "alias/production-apis-cmk"
-  kms_data_key_reuse_period_seconds = 300
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.cautionary_alerts_dead_letter_queue.arn,
     maxReceiveCount     = 3
