@@ -33,7 +33,7 @@ namespace CautionaryAlertsListener.Factories
                         Console.WriteLine($"{entityEvent.EventType} not handled - no action taken");
                         return null;
                     }
-                
+
                 default:
                     throw new ArgumentException($"Unknown event type: {entityEvent.EventType}");
             }
