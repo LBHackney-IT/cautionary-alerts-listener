@@ -149,7 +149,7 @@ jobs:
       - setup_remote_docker
       - run:
           name: build
-          command: docker compose build cautionary-alerts-listener-test
+          command: docker compose build --no-cache cautionary-alerts-listener-test
       - run:
           name: Run tests
           command: docker compose run cautionary-alerts-listener-test
