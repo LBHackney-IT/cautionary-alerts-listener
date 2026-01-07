@@ -4,6 +4,6 @@ namespace CautionaryAlertsListener.Boundary
     {
         public string Name { get; set; }
 
-        public string Email { get; set; }
+        public string E { get; set; }
     }
 }
