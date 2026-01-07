@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y openjdk-17-jdk
 RUN dotnet tool install --global dotnet-sonarscanner --version 5.6.0
 ENV PATH="$PATH:/root/.dotnet/tools"
 
-RUN dotnet sonarscanner begin /k:"LBHackney-IT_cautionary-alerts-listener" /o:"lbhackney-it" /d:sonar.host.url=https://sonarcloud.io /d:sonar.login="${SONAR_TOKEN}"
+RUN dotnet sonarscanner begin /k:"LBHackney-IT_cautionary-alerts-listener" /o:"lbhackney-it" /d:sonar.host.url=https://sonarcloud.io /d:sonar.login="${SONAR_TOKEN}" /d:sonar.scm.disabled=true
 
 # Copy csproj and restore as distinct layers
 COPY ./CautionaryAlertsListener.sln ./
