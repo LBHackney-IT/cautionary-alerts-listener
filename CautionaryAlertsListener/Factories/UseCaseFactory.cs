@@ -26,6 +26,14 @@ namespace CautionaryAlertsListener.Factories
                     {
                         return serviceProvider.GetService<IPersonUpdatedUseCase>();
                     }
+                case EventTypes.PersonCreatedEvent:
+                case EventTypes.TenureUpdatedEvent:
+                case EventTypes.TenureCreatedEvent:
+                    {
+                        Console.WriteLine($"{entityEvent.EventType} not handled - no action taken");
+                        return null;
+                    }
+
                 default:
                     throw new ArgumentException($"Unknown event type: {entityEvent.EventType}");
             }
