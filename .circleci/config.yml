@@ -143,9 +143,6 @@ jobs:
     executor: docker-python
     steps:
       - checkout
-      # - run:
-      #     name: Unshallow Git for SonarCloud
-      #     command: git fetch --unshallow || true
       - setup_remote_docker
       - run:
           name: build
