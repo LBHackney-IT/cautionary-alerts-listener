@@ -35,15 +35,7 @@ namespace CautionaryAlertsListener.UseCase
             var collectionToUpdate = new List<PropertyAlertNew>();
             foreach (var entity in cautionaryAlerts)
             {
-                foreach (var property in propCollection)
-                {
-                    var newValue = property.Value.ToString();
-                    var oldValue = deresializedOldData[property.Name]?.ToString();
-                    if (!newValue.Equals(oldValue) || !(oldValue is null))
-                    {
-                        entity.PersonName = entity.PersonName.Replace(oldValue, newValue);
-                    }
-                }
+                entity.PersonName = $"{deserializedNewData["FirstName"]} {deserializedNewData["LastName"]}";
 
                 collectionToUpdate.Add(entity);
             }
