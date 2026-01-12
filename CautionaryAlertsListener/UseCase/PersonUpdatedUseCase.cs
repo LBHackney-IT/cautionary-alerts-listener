@@ -35,8 +35,8 @@ namespace CautionaryAlertsListener.UseCase
             var collectionToUpdate = new List<PropertyAlertNew>();
             foreach (var entity in cautionaryAlerts)
             {
-                var firstName = propCollection[0]?.ToString();
-                var lastName = propCollection[1]?.ToString();
+                var firstName = propCollection[0]?.Value?.ToString();
+                var lastName = propCollection[1]?.Value?.ToString();
                 entity.PersonName = $"{firstName} {lastName}";
 
                 collectionToUpdate.Add(entity);
