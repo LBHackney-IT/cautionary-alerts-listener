@@ -29,7 +29,6 @@ namespace CautionaryAlertsListener.UseCase
             if (cautionaryAlerts is null || !cautionaryAlerts.Any()) return;
 
             var deserializedNewData = JObject.Parse(message.EventData.NewData.ToString());
-            
             var collectionToUpdate = new List<PropertyAlertNew>();
             foreach (var entity in cautionaryAlerts)
             {
