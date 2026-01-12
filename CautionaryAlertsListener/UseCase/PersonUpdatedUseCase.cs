@@ -30,12 +30,15 @@ namespace CautionaryAlertsListener.UseCase
 
             var deserializedNewData = JObject.Parse(message.EventData.NewData.ToString());
             // var deresializedOldData = JObject.Parse(message.EventData.OldData.ToString());
-            // var propCollection = deserializedNewData.Properties().ToList();
+            var propCollection = deserializedNewData.Properties().ToList();
 
             var collectionToUpdate = new List<PropertyAlertNew>();
             foreach (var entity in cautionaryAlerts)
             {
-                entity.PersonName = $"{deserializedNewData["FirstName"]} {deserializedNewData["LastName"]}";
+                var firstName = propCollection[0]?.ToString();
+                var lastName = propCollection[1]?.ToString();
+                
+                entity.PersonName = $"{firstName} {lastName}";
 
                 collectionToUpdate.Add(entity);
             }
