@@ -30,7 +30,6 @@ namespace CautionaryAlertsListener.UseCase
 
             var deserializedNewData = JObject.Parse(message.EventData.NewData.ToString());
             var deresializedOldData = JObject.Parse(message.EventData.OldData.ToString());
-            
             var oldFirstName = deresializedOldData["firstName"]?.ToString();
             var oldLastName = deresializedOldData["lastName"]?.ToString();
             var firstName = deserializedNewData["firstName"]?.ToString();
