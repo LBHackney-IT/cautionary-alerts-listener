@@ -41,7 +41,6 @@ namespace CautionaryAlertsListener.UseCase
 
                 if (oldFirstName != firstName || oldLastName != lastName)
                 entity.PersonName = $"{firstName} {lastName}";
-
                 collectionToUpdate.Add(entity);
             }
 
