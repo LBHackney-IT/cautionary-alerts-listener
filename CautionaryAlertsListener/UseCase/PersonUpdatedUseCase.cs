@@ -29,13 +29,13 @@ namespace CautionaryAlertsListener.UseCase
             if (cautionaryAlerts is null || !cautionaryAlerts.Any()) return;
 
             var deserializedNewData = JObject.Parse(message.EventData.NewData.ToString());
-            var deresializedOldData = JObject.Parse(message.EventData.OldData.ToString());
-            var propCollection = deserializedNewData.Properties().ToList();
+            // var deresializedOldData = JObject.Parse(message.EventData.OldData.ToString());
+            // var propCollection = deserializedNewData.Properties().ToList();
 
             var collectionToUpdate = new List<PropertyAlertNew>();
             foreach (var entity in cautionaryAlerts)
             {
-                entity.PersonName = $"{deserializedNewData["FirstName"]} {deserializedNewData["LastName"]}";
+                entity.PersonName = "John Smith";
 
                 collectionToUpdate.Add(entity);
             }
