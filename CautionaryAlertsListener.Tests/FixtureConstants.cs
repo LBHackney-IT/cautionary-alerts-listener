@@ -6,7 +6,7 @@ namespace CautionaryAlertsListener.Tests
         public static string TenureApiToken => "sdjkhfgsdkjfgsdjfgh";
         public static string OldFirstName = "OldFirstName";
         public static string OldLastName = "OldLastName";
-        public static string NewFirstName = "NewFirstName";
-        public static string NewLastName = "NewLastName";
+        public static string NewFirstName = "John";
+        public static string NewLastName = "Smith";
     }
 }
