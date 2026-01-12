@@ -44,8 +44,8 @@ namespace CautionaryAlertsListener.Tests.E2ETests.Steps
             var updatedCautionaryAlertInDb = dbContext.PropertyAlerts
                 .AsNoTracking().FirstOrDefault(x => x.Id == originalCautionaryAlertDb.Id);
             updatedCautionaryAlertInDb.Should().BeEquivalentTo(originalCautionaryAlertDb, config => config.Excluding(y => y.PersonName));
-            updatedCautionaryAlertInDb.PersonName.Should().StartWith("John");
-            updatedCautionaryAlertInDb.PersonName.Should().EndWith("Smith");
+            updatedCautionaryAlertInDb.PersonName.Should().StartWith(FixtureConstants.NewFirstName);
+            updatedCautionaryAlertInDb.PersonName.Should().EndWith(FixtureConstants.NewLastName);
         }
     }
 }
