@@ -37,7 +37,6 @@ namespace CautionaryAlertsListener.UseCase
             {
                 var firstName = propCollection[0]?.ToString();
                 var lastName = propCollection[1]?.ToString();
-                
                 entity.PersonName = $"{firstName} {lastName}";
 
                 collectionToUpdate.Add(entity);
