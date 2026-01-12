@@ -33,8 +33,8 @@ namespace CautionaryAlertsListener.UseCase
             var collectionToUpdate = new List<PropertyAlertNew>();
             foreach (var entity in cautionaryAlerts)
             {
-                var firstName = deserializedNewData["FirstName"]?.ToString();
-                var lastName = deserializedNewData["LastName"]?.ToString();
+                var firstName = deserializedNewData["firstName"]?.ToString();
+                var lastName = deserializedNewData["lastName"]?.ToString();
                 entity.PersonName = $"{firstName} {lastName}";
 
                 collectionToUpdate.Add(entity);
