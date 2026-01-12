@@ -39,7 +39,7 @@ namespace CautionaryAlertsListener.UseCase
             foreach (var entity in cautionaryAlerts)
             {
                 if (oldFirstName != firstName || oldLastName != lastName)
-                entity.PersonName = $"{firstName} {lastName}";
+                    entity.PersonName = $"{firstName} {lastName}";
                 collectionToUpdate.Add(entity);
             }
 
