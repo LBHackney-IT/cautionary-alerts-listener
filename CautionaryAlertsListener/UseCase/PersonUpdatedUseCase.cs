@@ -38,7 +38,6 @@ namespace CautionaryAlertsListener.UseCase
             var collectionToUpdate = new List<PropertyAlertNew>();
             foreach (var entity in cautionaryAlerts)
             {
-
                 if (oldFirstName != firstName || oldLastName != lastName)
                 entity.PersonName = $"{firstName} {lastName}";
                 collectionToUpdate.Add(entity);
