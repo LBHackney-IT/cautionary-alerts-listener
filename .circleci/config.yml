@@ -221,38 +221,38 @@ workflows:
           filters:
              branches:
                only: disaster-recovery-test
-      - terraform-init-and-plan-disaster-recovery:
-          requires:
-            - assume-role-disaster-recovery
-          filters:
-            branches:
-              only: disaster-recovery-test
-      - terraform-apply-disaster-recovery:
-          requires:
-            - terraform-init-and-plan-disaster-recovery
-          filters:
-            branches:
-              only: disaster-recovery-test
-      - permit-disaster-recovery-release:
-          type: approval
-          requires:
-            - terraform-apply-disaster-recovery
-          filters:
-            branches:
-              only: disaster-recovery-test
-      - deploy-to-disaster-recovery:
-          context:
-            - api-nuget-token-context
-            - "Serverless Framework"
-          requires:
-            - permit-disaster-recovery-release
-          filters:
-            branches:
-              only: disaster-recovery-test
+      # - terraform-init-and-plan-disaster-recovery:
+      #     requires:
+      #       - assume-role-disaster-recovery
+      #     filters:
+      #       branches:
+      #         only: disaster-recovery-test
+      # - terraform-apply-disaster-recovery:
+      #     requires:
+      #       - terraform-init-and-plan-disaster-recovery
+      #     filters:
+      #       branches:
+      #         only: disaster-recovery-test
+      # - permit-disaster-recovery-release:
+      #     type: approval
+      #     requires:
+      #       - terraform-apply-disaster-recovery
+      #     filters:
+      #       branches:
+      #         only: disaster-recovery-test
+      # - deploy-to-disaster-recovery:
+      #     context:
+      #       - api-nuget-token-context
+      #       - "Serverless Framework"
+      #     requires:
+      #       - permit-disaster-recovery-release
+      #     filters:
+      #       branches:
+      #         only: disaster-recovery-test
       - permit-disaster-recovery-cleanup:
           type: approval
           requires:
-            - deploy-to-disaster-recovery
+            - assume-role-disaster-recovery
           filters:
             branches:
               only: disaster-recovery-test
