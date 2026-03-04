@@ -127,6 +127,50 @@ commands:
           command: |
             cd ./CautionaryAlertsListener/
             sls deploy --stage <<parameters.stage>> --conceal
+  terraform-destroy:
+    description: "Runs Terraform Destroy"
+    parameters:
+      environment:
+        type: string
+    steps:
+      - *attach_workspace
+      - checkout
+      - run:
+          name: terraform init
+          command: |
+            cd ./terraform/<<parameters.environment>>/
+            terraform init
+      - run:
+          name: terraform destroy
+          command: |
+            cd ./terraform/<<parameters.environment>>/
+            terraform destroy -auto-approve
+      - persist_to_workspace:
+          root: *workspace_root
+          paths:
+            - .aws
+  serverless-remove:
+    description: "Removes Serverless deployment"
+    parameters:
+      stage:
+        type: string
+    steps:
+      - *attach_workspace
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install Node.js
+          command: |
+            curl -sL https://deb.nodesource.com/setup_20.x | bash -
+            apt-get update && apt-get install -y nodejs
+      - run:
+          name: Install serverless CLI
+          command: npm i -g serverless
+      - run:
+          name: Remove serverless deployment
+          command: |
+            cd ./CautionaryAlertsListener/
+            sls remove --stage <<parameters.stage>>
 
 jobs:
   assume-role-disaster-recovery:
@@ -154,6 +198,16 @@ jobs:
     steps:
       - deploy-lambda:
           stage: "production"
+  serverless-remove-disaster-recovery:
+    executor: docker-dotnet
+    steps:
+      - serverless-remove:
+          stage: "production"
+  terraform-destroy-disaster-recovery:
+    executor: docker-terraform
+    steps:
+      - terraform-destroy:
+          environment: "production"
 
 workflows:
   check-and-deploy-staging-and-production:
@@ -173,15 +227,9 @@ workflows:
           filters:
             branches:
               only: disaster-recovery-test
-      - terraform-compliance-disaster-recovery:
-          requires:
-            - terraform-init-and-plan-disaster-recovery
-          filters:
-            branches:
-              only: disaster-recovery-test
       - terraform-apply-disaster-recovery:
           requires:
-            - terraform-compliance-disaster-recovery
+            - terraform-init-and-plan-disaster-recovery
           filters:
             branches:
               only: disaster-recovery-test
@@ -198,6 +246,28 @@ workflows:
             - "Serverless Framework"
           requires:
             - permit-disaster-recovery-release
+          filters:
+            branches:
+              only: disaster-recovery-test
+      - permit-disaster-recovery-cleanup:
+          type: approval
+          requires:
+            - deploy-to-disaster-recovery
+          filters:
+            branches:
+              only: disaster-recovery-test
+      - serverless-remove-disaster-recovery:
+          context:
+            - api-nuget-token-context
+            - "Serverless Framework"
+          requires:
+            - permit-disaster-recovery-cleanup
+          filters:
+            branches:
+              only: disaster-recovery-test
+      - terraform-destroy-disaster-recovery:
+          requires:
+            - serverless-remove-disaster-recovery
           filters:
             branches:
               only: disaster-recovery-test
